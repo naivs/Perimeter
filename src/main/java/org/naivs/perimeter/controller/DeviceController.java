@@ -18,9 +18,9 @@ public class DeviceController {
     public List<DeviceEntity> getAllDevices() {
         return deviceService.findAll();
     }
-//
-//    @RequestMapping(method = RequestMethod.POST, value = "/create")
-//    public Long createDevice(@RequestBody DeviceEntity device) {
-//        return deviceService.createDevice(device);
-//    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/create")
+    public Long createDevice(@RequestBody DeviceEntity device) {
+        return deviceService.createDevice(device);
+    }
 }

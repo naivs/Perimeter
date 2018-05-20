@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="perimeterApp">
+    <head>
+        <meta charset="UTF-8">
+        <title>Project Perimeter</title>
+        <link rel="stylesheet" href="webapp/lib/bootstrap/css/bootstrap.css">
+        <link rel="stylesheet" href="webapp/css/main.css">
+    </head>
+    <body ng-controller="MainCtrl">
+        <nav class="topnav">
+            <a ng-class="{active: selected === 0}" ng-click="selected = 0" href="#!">Home</a>
+            <a ng-class="{active: selected === 1}" ng-click="selected = 1" href="#!devices">Devices</a>
+            <a ng-class="{active: selected === 2}" ng-click="selected = 2" href="#!contact">Contact</a>
+            <a ng-class="{active: selected === 3}" ng-click="selected = 3" href="#!about">About</a>
+        </nav><!-- /.topnav -->
+
+        <div class="container">
+            {{navBar[0].Home}}
+            <ng-view></ng-view>
+            <hr>
+            <footer>
+                <p class="text-right">Perimeter &copy;NaIvS Inc. 2018</p>
+            </footer>
+        </div><!--/.container-->
+
+        <script src="webapp/lib/angular/angular.js"></script>
+        <script src="webapp/lib/angular/angular-route.js"></script>
+        <script src="webapp/lib/angular/angular-resource.js"></script>
+        <script src="webapp/lib/jquery.js"></script>
+        <script src="webapp/lib/bootstrap/js/bootstrap.js"></script>
+
+        <script src="webapp/js/main.js"></script>
+    </body>
+</html>

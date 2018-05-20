@@ -17,18 +17,10 @@ public class DeviceService {
     @Autowired
     private DeviceRepository deviceRepository;
 
-//    public DeviceService() {
-//        deviceList = new ArrayList<>();
-//        deviceList.add(new DeviceEntity(1L, 234, "first device"));
-//    }
-
-//    public Long createDevice(DeviceEntity deviceEntity) {
-//        DeviceEntity deviceEntityOut = new DeviceEntity(
-//                deviceList.get(0).getId() + 1, deviceEntity.getTypeId(), deviceEntity.getDescription()
-//        );
-//        deviceList.add(deviceEntityOut);
-//        return deviceEntityOut.getId();
-//    }
+    public Long createDevice(DeviceEntity deviceEntity) {
+        deviceRepository.save(deviceEntity);
+        return deviceEntity.getId();
+    }
 
     public List<DeviceEntity> findAll() {
         List<DeviceEntity> deviceEntityList = new ArrayList<>();
