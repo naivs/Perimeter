@@ -36,7 +36,7 @@ perimeterApp.controller('DevicesCtrl', ['$scope', '$http', '$location', function
     $scope.updateDevices = function() {
         $http({
             method: 'GET',
-            url: 'http://localhost:8090/devices/all'
+            url: '/devices/all'
         }).then(function successCallback(response) {
             $scope.devices = response.data;
         }, function errorCallback(response) {
@@ -47,7 +47,7 @@ perimeterApp.controller('DevicesCtrl', ['$scope', '$http', '$location', function
     $scope.addDevice = function() {
         $http({
             method: 'POST',
-            url: 'http://localhost:8090/devices/create',
+            url: '/devices/create',
             data: {id: '', TypeId: $scope.typeId, Description: $scope.description},
             headers: {'Content-Type': 'application/json'}
         }).then(function successCallback(response) {    
