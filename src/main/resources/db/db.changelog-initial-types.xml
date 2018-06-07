@@ -1,0 +1,80 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="init-types.1" author="NaIvS">
+        <preConditions>
+            <tableExists tableName="device_type" schemaName="smart_home"/>
+        </preConditions>
+        <sql>
+            INSERT INTO smart_home.device_type (type, description)
+            VALUES ('SENSOR', 'Датчик для получения показаний');
+
+            INSERT INTO smart_home.device_type (type, description)
+            VALUES ('SWITCH', 'Выключатель');
+
+            INSERT INTO smart_home.device_type (type, description)
+            VALUES ('RFID', 'Считыватель RFID брелков');
+        </sql>
+    </changeSet>
+    <changeSet id="init-types.2" author="NaIvS">
+        <preConditions>
+            <tableExists tableName="operation_type" schemaName="smart_home"/>
+        </preConditions>
+        <sql>
+            INSERT INTO smart_home.operation_type (type, description)
+            VALUES ('GET_TEMPERATURE', 'Получить показания температуры');
+
+            INSERT INTO smart_home.operation_type (type, description)
+            VALUES ('GET_HUMIDITY', 'Получить показания влажности');
+
+            INSERT INTO smart_home.operation_type (type, description)
+            VALUES ('GET_PRESSURE', 'Получить показания давления');
+
+            INSERT INTO smart_home.operation_type (type, description)
+            VALUES ('CHECK_RAIN', 'Идет ли дождь');
+
+            INSERT INTO smart_home.operation_type (type, description)
+            VALUES ('GET_AMPERAGE', 'Потребление электричества');
+
+            INSERT INTO smart_home.operation_type (type, description)
+            VALUES ('GET_PRESENCE', 'Есть ли кто в помещении');
+
+            INSERT INTO smart_home.operation_type (type, description)
+            VALUES ('GET_VOLTAGE', 'Получить напряжение');
+
+            INSERT INTO smart_home.operation_type (type, description)
+            VALUES ('LIGHT_AMOUNT', 'Показание освещенности помещения');
+        </sql>
+    </changeSet>
+    <changeSet id="init-types.3" author="NaIvS">
+        <preConditions>
+            <tableExists tableName="indication_type" schemaName="smart_home"/>
+        </preConditions>
+        <sql>
+            INSERT INTO smart_home.indication_type (type, description)
+            VALUES ('TEMPERATURE', 'Значение температуры');
+
+            INSERT INTO smart_home.indication_type (type, description)
+            VALUES ('HUMIDITY', 'Значение влажности');
+
+            INSERT INTO smart_home.indication_type (type, description)
+            VALUES ('PRESSURE', 'Значение атмосферного давления');
+
+            INSERT INTO smart_home.indication_type (type, description)
+            VALUES ('RAIN', 'Показание наличия дождя');
+
+            INSERT INTO smart_home.indication_type (type, description)
+            VALUES ('AMPERAGE', 'Значение силы тока');
+
+            INSERT INTO smart_home.indication_type (type, description)
+            VALUES ('PRESENCE', 'Показания наличия движения');
+
+            INSERT INTO smart_home.indication_type (type, description)
+            VALUES ('VOLTAGE', 'Значение напряжения');
+        </sql>
+    </changeSet>
+</databaseChangeLog>

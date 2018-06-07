@@ -1,20 +1,21 @@
 package org.naivs.perimeter.data.entity;
 
 import javax.persistence.*;
-import java.io.Serializable;
+import java.util.Date;
 
 @Entity
-@Table(name = "device", schema = "smart_home")
-public class DeviceEntity implements Serializable {
+@Table(name = "operation_log", schema = "audit")
+public class OperationLogEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @Column(name = "type_id")
     private long typeId;
-    private String description;
+    private Date date;
 
-    public DeviceEntity() {}
+    public OperationLogEntity() {
+    }
 
     public long getId() {
         return id;
@@ -32,11 +33,11 @@ public class DeviceEntity implements Serializable {
         this.typeId = typeId;
     }
 
-    public String getDescription() {
-        return description;
+    public Date getDate() {
+        return date;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setDate(Date date) {
+        this.date = date;
     }
 }
