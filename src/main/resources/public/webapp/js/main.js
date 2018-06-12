@@ -17,9 +17,10 @@ perimeterApp.config(['$routeProvider', function($routeProvide) {
         });
 }]);
 
-perimeterApp.controller('MainCtrl', ['$scope', function($scope) {
-    $scope.selected = 0;
+perimeterApp.controller('MainCtrl', ['$scope', '$route', function($scope, $route) {
+    $rootScope.selected = 0;
     $scope.text = 'Project PERIMETER';
+    $scope.reloadPage = $route.reload();
 }]);
 
 perimeterApp.controller('HomeCtrl', ['$scope', '$http', '$location', function($scope, $http, $location) {
@@ -27,7 +28,7 @@ perimeterApp.controller('HomeCtrl', ['$scope', '$http', '$location', function($s
 }]);
 
 perimeterApp.controller('DevicesCtrl', ['$scope', '$http', '$location', function($scope, $http, $location) {
-
+    $scope.selected = 1;
     $scope.devices = [];
 
     $scope.typeId = 0;

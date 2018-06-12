@@ -1,34 +1,54 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="perimeterApp">
-    <head>
-        <meta charset="UTF-8">
-        <title>Project Perimeter</title>
-        <link rel="stylesheet" href="webapp/lib/bootstrap/css/bootstrap.css">
-        <link rel="stylesheet" href="webapp/css/main.css">
-    </head>
-    <body ng-controller="MainCtrl">
-        <nav class="topnav">
-            <a ng-class="{active: selected === 0}" ng-click="selected = 0" href="#!">Home</a>
-            <a ng-class="{active: selected === 1}" ng-click="selected = 1" href="#!devices">Devices</a>
-            <a ng-class="{active: selected === 2}" ng-click="selected = 2" href="#!contact">Contact</a>
-            <a ng-class="{active: selected === 3}" ng-click="selected = 3" href="#!about">About</a>
-        </nav><!-- /.topnav -->
+<head>
+    <meta charset="UTF-8">
+    <title>Project Perimeter</title>
+    <link rel="stylesheet" href="webapp/lib/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="webapp/css/main.css">
+</head>
+<body ng-controller="MainCtrl">
+    <div class="wrapper">
+        <!--sidebar-->
+        <div class="sidebar">
+            <div class="sidebar-brand">Perimeter</div>
+            <a ng-class="{active: selected === 0}" ng-click="selected = 0" href="#!">Dashboard</a>
+            <div class="dropdown-container">Smart home
+                <a class="sub-menu" ng-class="{active: selected === 1}" ng-click="selected = 1" href="#!devices">Devices</a>
+                <a class="sub-menu" ng-class="{active: selected === 2}" ng-click="selected = 2" href="#">Reports</a>
+                <a class="sub-menu" ng-class="{active: selected === 3}" ng-click="selected = 3" href="#">Settings</a>
+            </div>
+            <a ng-class="{active: selected === 4}" ng-click="selected = 4" href="#!contact">Library</a>
+            <div class="dropdown-container">Media share
+                <a class="sub-menu" ng-class="{active: selected === 6}" ng-click="selected = 6" href="#!devices">Music</a>
+                <a class="sub-menu" ng-class="{active: selected === 7}" ng-click="selected = 7" href="#">Video</a>
+                <a class="sub-menu" ng-class="{active: selected === 8}" ng-click="selected = 8" href="#">Photo</a>
+                <a class="sub-menu" ng-class="{active: selected === 9}" ng-click="selected = 9" href="#">Files</a>
+            </div>
+            <a ng-class="{active: selected === 10}" ng-click="selected = 10" href="#!about">Finance</a>
+            <a ng-class="{active: selected === 11}" ng-click="selected = 11" href="#!about">Git</a>
+            <a ng-class="{active: selected === 12}" ng-click="selected = 12" href="#!about">Events</a>
+        </div>
 
-        <div class="container">
-            {{navBar[0].Home}}
-            <ng-view></ng-view>
-            <hr>
-            <footer>
-                <p class="text-right">Perimeter &copy;NaIvS Inc. 2018</p>
-            </footer>
-        </div><!--/.container-->
+        <!-- content-->
+        <div class="content-wrapper">
+            <div class="container">
+                {{navBar[0].Home}}
+                <ng-view></ng-view>
+                <hr>
+                <footer>
+                    <p class="text-right">Perimeter &copy;NaIvS Inc. 2018</p>
+                </footer>
+            </div>
 
-        <script src="webapp/lib/angular/angular.js"></script>
-        <script src="webapp/lib/angular/angular-route.js"></script>
-        <script src="webapp/lib/angular/angular-resource.js"></script>
-        <script src="webapp/lib/jquery.js"></script>
-        <script src="webapp/lib/bootstrap/js/bootstrap.js"></script>
+            <script src="webapp/lib/angular/angular.js"></script>
+            <script src="webapp/lib/angular/angular-route.js"></script>
+            <script src="webapp/lib/angular/angular-resource.js"></script>
+            <script src="webapp/lib/jquery.js"></script>
+            <script src="webapp/lib/bootstrap/js/bootstrap.js"></script>
+            <script src="webapp/lib/fontawesome-all.js"></script>
 
-        <script src="webapp/js/main.js"></script>
-    </body>
+            <script src="webapp/js/main.js"></script>
+        </div>
+    </div>
+</body>
 </html>
