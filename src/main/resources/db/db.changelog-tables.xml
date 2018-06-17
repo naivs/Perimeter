@@ -78,7 +78,6 @@
             <column name="description" type="varchar(255)"/>
         </createTable>
     </changeSet>
-
     <changeSet id="tables.7" author="NaIvS">
         <preConditions onFail="MARK_RAN">
             <and>
@@ -123,6 +122,29 @@
                 <constraints nullable="false"/>
             </column>
             <column name="date" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="tables.9" author="NaIvS">
+        <preConditions>
+            <tableExists tableName="device" schemaName="smart_home"/>
+        </preConditions>
+        <createTable schemaName="smart_home"
+                     tableName="device_params">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="device_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
         </createTable>

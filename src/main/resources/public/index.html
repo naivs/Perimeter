@@ -11,22 +11,22 @@
         <!--sidebar-->
         <div class="sidebar">
             <div class="sidebar-brand">Perimeter</div>
-            <a ng-class="{active: selected === 0}" ng-click="selected = 0" href="#!">Dashboard</a>
+            <a id="menuItem-0" href="#!">Dashboard</a>
             <div class="dropdown-container">Smart home
-                <a class="sub-menu" ng-class="{active: selected === 1}" ng-click="selected = 1" href="#!devices">Devices</a>
-                <a class="sub-menu" ng-class="{active: selected === 2}" ng-click="selected = 2" href="#">Reports</a>
-                <a class="sub-menu" ng-class="{active: selected === 3}" ng-click="selected = 3" href="#">Settings</a>
+                <a id="menuItem-1" class="sub-menu" href="#!devices">Devices</a>
+                <a id="menuItem-2" class="sub-menu" href="#">Reports</a>
+                <a id="menuItem-3" class="sub-menu" href="#!settings">Settings</a>
             </div>
-            <a ng-class="{active: selected === 4}" ng-click="selected = 4" href="#!contact">Library</a>
+            <a  id="menuItem-4" href="#!contact">Library</a>
             <div class="dropdown-container">Media share
-                <a class="sub-menu" ng-class="{active: selected === 6}" ng-click="selected = 6" href="#!devices">Music</a>
-                <a class="sub-menu" ng-class="{active: selected === 7}" ng-click="selected = 7" href="#">Video</a>
-                <a class="sub-menu" ng-class="{active: selected === 8}" ng-click="selected = 8" href="#">Photo</a>
-                <a class="sub-menu" ng-class="{active: selected === 9}" ng-click="selected = 9" href="#">Files</a>
+                <a id="menuItem-5" class="sub-menu" href="#">Music</a>
+                <a id="menuItem-6" class="sub-menu" href="#">Video</a>
+                <a id="menuItem-7" class="sub-menu" href="#">Photo</a>
+                <a id="menuItem-8" class="sub-menu" href="#">Files</a>
             </div>
-            <a ng-class="{active: selected === 10}" ng-click="selected = 10" href="#!about">Finance</a>
-            <a ng-class="{active: selected === 11}" ng-click="selected = 11" href="#!about">Git</a>
-            <a ng-class="{active: selected === 12}" ng-click="selected = 12" href="#!about">Events</a>
+            <a id="menuItem-9" href="#!about">Finance</a>
+            <a id="menuItem-10" href="#!about">Git</a>
+            <a id="menuItem-11" href="#!about">Events</a>
         </div>
 
         <!-- content-->
@@ -44,6 +44,7 @@
             <script src="webapp/lib/angular/angular-route.js"></script>
             <script src="webapp/lib/angular/angular-resource.js"></script>
             <script src="webapp/lib/jquery.js"></script>
+            <script src="webapp/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
             <script src="webapp/lib/bootstrap/js/bootstrap.js"></script>
             <script src="webapp/lib/fontawesome-all.js"></script>
 
