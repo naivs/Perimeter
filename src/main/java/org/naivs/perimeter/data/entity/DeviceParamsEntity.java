@@ -6,6 +6,13 @@ import javax.persistence.*;
 @Table(name = "device_params", schema = "smart_home")
 public class DeviceParamsEntity {
 
+    public static final String URL = "URL адрес";
+    public static final String PORT = "Порт";
+    public static final String UPDATE_INTERVAL = "Интервал обновления данных";
+    public static final String IS_RUNNING = "Запущен";
+    public static final String OPERATION = "Поддерживаемая операция";
+    public static final String IP_ADDRESS = "IP адрес";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

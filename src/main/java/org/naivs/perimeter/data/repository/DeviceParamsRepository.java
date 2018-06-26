@@ -9,5 +9,9 @@ import java.util.List;
 @Repository
 public interface DeviceParamsRepository extends CrudRepository<DeviceParamsEntity, Long> {
 
-    List<DeviceParamsEntity> getAllByDeviceId(Long deviceId);
+    List<DeviceParamsEntity> findAllByDeviceId(Long deviceId);
+
+    List<DeviceParamsEntity> findAllByDeviceIdAndName(Long deviceId, String name);
+
+    DeviceParamsEntity findDeviceParamsEntityByDeviceIdAndName(Long deviceId, String name);
 }

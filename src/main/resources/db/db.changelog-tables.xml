@@ -53,11 +53,11 @@
             </sqlCheck>
         </preConditions>
         <createTable schemaName="smart_home"
-                     tableName="operation_type">
+                     tableName="operations">
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="type" type="varchar(255)">
+            <column name="name" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
             <column name="description" type="varchar(255)"/>
@@ -108,7 +108,7 @@
     </changeSet>
     <changeSet id="tables.8" author="NaIvS">
         <preConditions onFail="MARK_RAN">
-            <tableExists tableName="operation_type" schemaName="smart_home"/>
+            <tableExists tableName="operations" schemaName="smart_home"/>
             <sqlCheck expectedResult="1">
                 SELECT count(*) FROM information_schema.schemata WHERE schema_name = 'audit'
             </sqlCheck>
@@ -118,7 +118,10 @@
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="type_id" type="bigint">
+            <column name="operation_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="device_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
             <column name="date" type="timestamp">
