@@ -22,31 +22,31 @@
     </changeSet>
     <changeSet id="init-types.2" author="NaIvS">
         <preConditions>
-            <tableExists tableName="operation_type" schemaName="smart_home"/>
+            <tableExists tableName="operations" schemaName="smart_home"/>
         </preConditions>
         <sql>
-            INSERT INTO smart_home.operation_type (type, description)
+            INSERT INTO smart_home.operations (name, description)
             VALUES ('GET_TEMPERATURE', 'Получить показания температуры');
 
-            INSERT INTO smart_home.operation_type (type, description)
+            INSERT INTO smart_home.operations (name, description)
             VALUES ('GET_HUMIDITY', 'Получить показания влажности');
 
-            INSERT INTO smart_home.operation_type (type, description)
+            INSERT INTO smart_home.operations (name, description)
             VALUES ('GET_PRESSURE', 'Получить показания давления');
 
-            INSERT INTO smart_home.operation_type (type, description)
+            INSERT INTO smart_home.operations (name, description)
             VALUES ('CHECK_RAIN', 'Идет ли дождь');
 
-            INSERT INTO smart_home.operation_type (type, description)
+            INSERT INTO smart_home.operations (name, description)
             VALUES ('GET_AMPERAGE', 'Потребление электричества');
 
-            INSERT INTO smart_home.operation_type (type, description)
+            INSERT INTO smart_home.operations (name, description)
             VALUES ('GET_PRESENCE', 'Есть ли кто в помещении');
 
-            INSERT INTO smart_home.operation_type (type, description)
+            INSERT INTO smart_home.operations (name, description)
             VALUES ('GET_VOLTAGE', 'Получить напряжение');
 
-            INSERT INTO smart_home.operation_type (type, description)
+            INSERT INTO smart_home.operations (name, description)
             VALUES ('LIGHT_AMOUNT', 'Показание освещенности помещения');
         </sql>
     </changeSet>

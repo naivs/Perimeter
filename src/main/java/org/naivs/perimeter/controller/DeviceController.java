@@ -1,8 +1,8 @@
 package org.naivs.perimeter.controller;
 
-import org.naivs.perimeter.data.entity.DeviceEntity;
 import org.naivs.perimeter.data.frontEntity.DeviceFE;
 import org.naivs.perimeter.service.DeviceService;
+import org.naivs.perimeter.service.runtime.DeviceRuntimeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +14,9 @@ public class DeviceController {
 
     @Autowired
     private DeviceService deviceService;
+
+    @Autowired
+    private DeviceRuntimeService deviceRuntimeService;
 
     @GetMapping("/all")
     public List<DeviceFE> getAllDevices() {
@@ -28,5 +31,15 @@ public class DeviceController {
     @RequestMapping(method = RequestMethod.DELETE, value = "/delete/{id}")
     public Long delete(@PathVariable("id") Long id) {
         return deviceService.delete(id);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/run")
+    public String run(@RequestParam("deviceId") Long id) {
+        return deviceRuntimeService.runDevice(id);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/shutdown")
+    public String shutdown(@RequestParam("deviceId") Long id) {
+        return deviceRuntimeService.shutdownDevice(id);
     }
 }

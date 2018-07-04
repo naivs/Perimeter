@@ -3,13 +3,13 @@ package org.naivs.perimeter.data.entity;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "operation_type", schema = "smart_home")
+@Table(name = "operations", schema = "smart_home")
 public class OperationTypeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private String type;
+    private String name;
     private String description;
 
     public OperationTypeEntity() {
@@ -23,12 +23,12 @@ public class OperationTypeEntity {
         this.id = id;
     }
 
-    public String getType() {
-        return type;
+    public String getName() {
+        return name;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {

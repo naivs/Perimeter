@@ -10,8 +10,10 @@ public class OperationLogEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column(name = "type_id")
-    private long typeId;
+    @Column(name = "operation_id")
+    private long operationId;
+    @Column(name = "device_id")
+    private long deviceId;
     private Date date;
 
     public OperationLogEntity() {
@@ -25,12 +27,20 @@ public class OperationLogEntity {
         this.id = id;
     }
 
-    public long getTypeId() {
-        return typeId;
+    public long getOperationId() {
+        return operationId;
     }
 
-    public void setTypeId(long typeId) {
-        this.typeId = typeId;
+    public void setOperationId(long operationId) {
+        this.operationId = operationId;
+    }
+
+    public long getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(long deviceId) {
+        this.deviceId = deviceId;
     }
 
     public Date getDate() {

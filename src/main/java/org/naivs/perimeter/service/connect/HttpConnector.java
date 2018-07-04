@@ -11,10 +11,10 @@ public class HttpConnector {
 
     private HttpURLConnection con;
 
-    public String get(String deviceUrl, Map<String, String> parameters) {
+    public String get(String deviceUrl, int port, Map<String, String> parameters) {
 
         try {
-            URL url = new URL(deviceUrl);
+            URL url = new URL("http", deviceUrl, port, "");
             con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
             con.setDoOutput(true);
@@ -43,7 +43,8 @@ public class HttpConnector {
         } catch (IOException e) {
             return "error";
         } finally {
-            con.disconnect();
+            if (con != null)
+                con.disconnect();
         }
     }
 }

@@ -54,7 +54,7 @@ public class DeviceService {
             deviceFE.setId(deviceEntity.getId());
             deviceFE.setTypeId(deviceEntity.getTypeId());
             deviceFE.setDescription(deviceEntity.getDescription());
-            deviceFE.setDeviceParams(deviceParamsRepository.getAllByDeviceId(deviceEntity.getId()));
+            deviceFE.setDeviceParams(deviceParamsRepository.findAllByDeviceId(deviceEntity.getId()));
             deviceFEList.add(deviceFE);
         });
 
@@ -62,7 +62,7 @@ public class DeviceService {
     }
 
     public Long delete(Long id) {
-        deviceParamsRepository.getAllByDeviceId(id).forEach(deviceParam -> {
+        deviceParamsRepository.findAllByDeviceId(id).forEach(deviceParam -> {
             deviceParamsRepository.deleteById(deviceParam.getId());
         });
 
