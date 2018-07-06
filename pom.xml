@@ -4,8 +4,11 @@
 
     <groupId>org.naivs</groupId>
     <artifactId>perimeter</artifactId>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
+    <modules>
+        <module>emulator</module>
+    </modules>
     <name>Perimeter</name>
 
     <parent>
