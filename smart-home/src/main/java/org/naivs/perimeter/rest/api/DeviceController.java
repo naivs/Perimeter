@@ -1,8 +1,8 @@
-package org.naivs.perimeter.rest.controller;
+package org.naivs.perimeter.rest.api;
 
-import org.naivs.perimeter.frontEntity.DeviceFE;
+import org.naivs.perimeter.rest.to.DeviceTo;
 import org.naivs.perimeter.data.service.DeviceService;
-import org.naivs.perimeter.service.runtime.DeviceRuntimeService;
+import org.naivs.perimeter.services.runtime.DeviceRuntimeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,12 +19,12 @@ public class DeviceController {
     private DeviceRuntimeService deviceRuntimeService;
 
     @GetMapping("/all")
-    public List<DeviceFE> getAllDevices() {
+    public List<DeviceTo> getAllDevices() {
         return deviceService.findAll();
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/create")
-    public Long createDevice(@RequestBody DeviceFE device) {
+    public Long createDevice(@RequestBody DeviceTo device) {
         return deviceService.createDevice(device);
     }
 

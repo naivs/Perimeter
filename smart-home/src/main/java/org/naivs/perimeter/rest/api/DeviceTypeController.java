@@ -1,4 +1,4 @@
-package org.naivs.perimeter.rest.controller;
+package org.naivs.perimeter.rest.api;
 
 import org.naivs.perimeter.data.entity.DeviceTypeEntity;
 import org.naivs.perimeter.data.service.DeviceTypeService;

@@ -2,7 +2,7 @@ package org.naivs.perimeter.data.service;
 
 import org.naivs.perimeter.data.entity.DeviceEntity;
 import org.naivs.perimeter.data.entity.DeviceParamsEntity;
-import org.naivs.perimeter.frontEntity.DeviceFE;
+import org.naivs.perimeter.rest.to.DeviceTo;
 import org.naivs.perimeter.data.repository.DeviceParamsRepository;
 import org.naivs.perimeter.data.repository.DeviceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,22 +14,20 @@ import java.util.List;
 @Service
 public class DeviceService {
 
-    private List<DeviceEntity> deviceList;
-
     @Autowired
     private DeviceRepository deviceRepository;
 
     @Autowired
     private DeviceParamsRepository deviceParamsRepository;
 
-    public Long createDevice(DeviceFE deviceFE) {
+    public Long createDevice(DeviceTo deviceTo) {
         DeviceEntity deviceEntity = new DeviceEntity();
-        deviceEntity.setTypeId(deviceFE.getTypeId());
-        deviceEntity.setDescription(deviceFE.getDescription());
+        deviceEntity.setTypeId(deviceTo.getTypeId());
+        deviceEntity.setDescription(deviceTo.getDescription());
         deviceRepository.save(deviceEntity);
 
-        Long deviceId = deviceRepository.findByTypeIdAndDescription(deviceFE.getTypeId(), deviceFE.getDescription()).getId();
-        deviceFE.getDeviceParams().forEach(param -> {
+        Long deviceId = deviceRepository.findByTypeIdAndDescription(deviceTo.getTypeId(), deviceTo.getDescription()).getId();
+        deviceTo.getDeviceParams().forEach(param -> {
             DeviceParamsEntity deviceParamsEntity = new DeviceParamsEntity();
             deviceParamsEntity.setName(param.getName());
             deviceParamsEntity.setName(param.getName());
@@ -42,22 +40,22 @@ public class DeviceService {
         return deviceEntity.getId();
     }
 
-    public List<DeviceFE> findAll() {
-        List<DeviceFE> deviceFEList = new ArrayList<>();
+    public List<DeviceTo> findAll() {
+        List<DeviceTo> deviceToList = new ArrayList<>();
 
         List<DeviceEntity> deviceEntityList = new ArrayList<>();
         deviceRepository.findAll().forEach(deviceEntityList::add);
 
         deviceEntityList.forEach(deviceEntity -> {
-            DeviceFE deviceFE = new DeviceFE();
-            deviceFE.setId(deviceEntity.getId());
-            deviceFE.setTypeId(deviceEntity.getTypeId());
-            deviceFE.setDescription(deviceEntity.getDescription());
-            deviceFE.setDeviceParams(deviceParamsRepository.findAllByDeviceId(deviceEntity.getId()));
-            deviceFEList.add(deviceFE);
+            DeviceTo deviceTo = new DeviceTo();
+            deviceTo.setId(deviceEntity.getId());
+            deviceTo.setTypeId(deviceEntity.getTypeId());
+            deviceTo.setDescription(deviceEntity.getDescription());
+            deviceTo.setDeviceParams(deviceParamsRepository.findAllByDeviceId(deviceEntity.getId()));
+            deviceToList.add(deviceTo);
         });
 
-        return deviceFEList;
+        return deviceToList;
     }
 
     public Long delete(Long id) {

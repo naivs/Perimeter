@@ -1,4 +1,4 @@
-package org.naivs.perimeter.service.runtime;
+package org.naivs.perimeter.services.runtime;
 
 import org.naivs.perimeter.data.repository.DeviceRepository;
 import org.springframework.beans.factory.annotation.Autowired;

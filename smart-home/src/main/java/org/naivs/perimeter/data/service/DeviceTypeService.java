@@ -11,8 +11,6 @@ import java.util.List;
 @Service
 public class DeviceTypeService {
 
-    private List<DeviceTypeEntity> deviceTypeEntityList;
-
     @Autowired
     private DeviceTypeRepository deviceTypeRepository;
 

@@ -1,7 +1,7 @@
-package org.naivs.perimeter.service.runtime;
+package org.naivs.perimeter.services.runtime;
 
 import org.naivs.perimeter.data.entity.DeviceEntity;
-import org.naivs.perimeter.service.connect.HttpConnector;
+import org.naivs.perimeter.services.connect.HttpConnector;
 
 import java.util.Date;
 

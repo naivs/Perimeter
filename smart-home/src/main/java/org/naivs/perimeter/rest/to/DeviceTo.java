@@ -1,17 +1,17 @@
-package org.naivs.perimeter.frontEntity;
+package org.naivs.perimeter.rest.to;
 
 import org.naivs.perimeter.data.entity.DeviceParamsEntity;
 
 import java.util.List;
 
-public class DeviceFE {
+public class DeviceTo {
 
     private Long id;
     private Long typeId;
     private String description;
     private List<DeviceParamsEntity> deviceParams;
 
-    public DeviceFE() {
+    public DeviceTo() {
     }
 
     public Long getId() {

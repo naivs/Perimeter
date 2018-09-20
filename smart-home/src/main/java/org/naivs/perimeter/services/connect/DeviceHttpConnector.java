@@ -1,4 +1,4 @@
-package org.naivs.perimeter.service.connect;
+package org.naivs.perimeter.services.connect;
 
 public interface DeviceHttpConnector {
 
