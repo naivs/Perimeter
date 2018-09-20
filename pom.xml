@@ -3,8 +3,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.naivs</groupId>
-    <artifactId>org.naivs.perimeter</artifactId>
+    <artifactId>perimeter</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
     <modules>
         <module>emulator</module>
         <module>smart-home</module>
