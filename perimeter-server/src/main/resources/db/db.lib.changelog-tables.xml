@@ -1,0 +1,96 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    
+    <changeSet id="table.1" author="NaIvS">
+        <sql>CREATE SCHEMA library;</sql>
+    </changeSet>
+
+    <changeSet id="table.2" author="NaIvS">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <sqlCheck expectedResult="1">
+                    SELECT count(*) FROM information_schema.schemata WHERE schema_name = 'library'
+                </sqlCheck>
+                <tableExists schemaName="library" tableName="lib_type"/>
+                <tableExists schemaName="library" tableName="lib_author"/>
+            </and>
+        </preConditions>
+        <createTable schemaName="library" tableName="lib_paper">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="author_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_author" references="library.lib_author(id)"/>
+            </column>
+            <column name="year" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="language" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="genre" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="varchar(255)">
+                <constraints nullable="false" foreignKeyName="fk_type" references="library.lib_type(name)"/>
+            </column>
+            <column name="location" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="text"/>
+            <column name="cover_url" type="varchar(255)"/>
+            <column name="format" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="load_date" type="date">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="table.3" author="NaIvS">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT count(*) FROM information_schema.schemata WHERE schema_name = 'library'
+            </sqlCheck>
+        </preConditions>
+        <createTable schemaName="library" tableName="lib_type">
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="description" type="text"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="table.4" author="NaIvS">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT count(*) FROM information_schema.schemata WHERE schema_name = 'library'
+            </sqlCheck>
+        </preConditions>
+        <createTable schemaName="library" tableName="lib_author">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="dates" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="place" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="photo_url" type="varchar(255)"/>
+            <column name="description" type="text"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

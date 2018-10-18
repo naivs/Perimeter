@@ -8,7 +8,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>emulator</module>
-        <module>smart-home</module>
+        <module>perimeter-server</module>
     </modules>
     <name>Perimeter</name>
 
