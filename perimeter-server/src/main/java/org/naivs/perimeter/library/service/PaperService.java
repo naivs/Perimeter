@@ -21,7 +21,7 @@ public class PaperService {
         paperRepository.deleteById(id);
     }
 
-    private List<PaperEntity> getAll() {
+    public List<PaperEntity> getAll() {
         return paperRepository.findAll();
     }
 }

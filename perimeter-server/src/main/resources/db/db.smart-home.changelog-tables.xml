@@ -23,6 +23,11 @@
     </changeSet>
     <changeSet id="tables.3" author="NaIvS">
         <preConditions onFail="MARK_RAN">
+            <and>
+                <not>
+                    <tableExists schemaName="smart_home" tableName="device_type"/>
+                </not>
+            </and>
             <sqlCheck expectedResult="1">
                 SELECT count(*) FROM information_schema.schemata WHERE schema_name = 'smart_home'
             </sqlCheck>

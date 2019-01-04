@@ -8,9 +8,19 @@ import java.sql.Date;
 @Table(name = "lib_paper", schema = "library")
 public class PaperEntity implements Serializable {
 
+    // auto
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "cover_path")
+    private String coverPath; // (may be null. If it is - take cover from paper file)
+    @Column(name = "file_path")
+    private String filePath;
+    @Column(name = "load_date")
+    private Date loadDate;
+    private String format;
+
+    // from frontend
     private String name;
     @Column(name = "author_id")
     private Long authorId;
@@ -20,11 +30,6 @@ public class PaperEntity implements Serializable {
     private String type;
     private String location;
     private String description;
-    @Column(name = "cover_url")
-    private String coverUrl;
-    private String format;
-    @Column(name = "load_date")
-    private Date loadDate;
 
     public PaperEntity() {
     }
@@ -35,6 +40,38 @@ public class PaperEntity implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getCoverPath() {
+        return coverPath;
+    }
+
+    public void setCoverPath(String coverPath) {
+        this.coverPath = coverPath;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+    public Date getLoadDate() {
+        return loadDate;
+    }
+
+    public void setLoadDate(Date loadDate) {
+        this.loadDate = loadDate;
+    }
+
+    public String getFormat() {
+        return format;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
     }
 
     public String getName() {
@@ -99,29 +136,5 @@ public class PaperEntity implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getCoverUrl() {
-        return coverUrl;
-    }
-
-    public void setCoverUrl(String coverUrl) {
-        this.coverUrl = coverUrl;
-    }
-
-    public String getFormat() {
-        return format;
-    }
-
-    public void setFormat(String format) {
-        this.format = format;
-    }
-
-    public Date getLoadDate() {
-        return loadDate;
-    }
-
-    public void setLoadDate(Date loadDate) {
-        this.loadDate = loadDate;
     }
 }

@@ -98,4 +98,20 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="table.5" author="NaIvS">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <sqlCheck expectedResult="1">
+                    SELECT count(*) FROM information_schema.schemata WHERE schema_name = 'library'
+                </sqlCheck>
+                <tableExists schemaName="library" tableName="lib_paper"/>
+                <columnExists schemaName="library" tableName="lib_paper" columnName="cover_url"/>
+            </and>
+        </preConditions>
+        <renameColumn schemaName="library" tableName="lib_paper" oldColumnName="cover_url" newColumnName="cover_path"/>
+        <addColumn schemaName="library" tableName="lib_paper">
+            <column name="file_path" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

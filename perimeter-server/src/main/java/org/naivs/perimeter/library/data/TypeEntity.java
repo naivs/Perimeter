@@ -8,7 +8,6 @@ import java.io.Serializable;
 public class TypeEntity implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String name;
     private String description;
 

@@ -9,6 +9,10 @@ import java.util.List;
 @Repository
 public interface PaperRepository extends CrudRepository<PaperEntity, Long> {
 
+    /**
+     * Get all paper entities
+     * @return List of paper entities
+     */
     @Query(value = "SELECT p FROM PaperEntity p")
     List<PaperEntity> findAll();
 }
