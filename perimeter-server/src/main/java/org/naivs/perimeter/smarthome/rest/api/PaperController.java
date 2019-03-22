@@ -3,6 +3,7 @@ package org.naivs.perimeter.smarthome.rest.api;
 import org.apache.commons.io.IOUtils;
 import org.naivs.perimeter.library.data.PaperEntity;
 import org.naivs.perimeter.library.service.PaperService;
+import org.naivs.perimeter.library.service.PdfService;
 import org.naivs.perimeter.smarthome.rest.to.PaperTo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -27,6 +29,9 @@ public class PaperController {
 
     @Autowired
     private PaperService paperService;
+
+    @Autowired
+    private PdfService pdfService;
 
     @Value("${library.store}")
     private String storePath;
@@ -49,15 +54,23 @@ public class PaperController {
             paper.setDescription(params.get("description")[0]);
 
             // auto
-            MultipartFile cover = files.getFirst("coverFile");
-            if (cover != null) {
-                paper.setCoverPath(convert(cover, storePath).getName());
-            }
             File paperFile = convert(files.getFirst("paperFile"), storePath);
             paper.setFilePath(paperFile.getName());
             paper.setLoadDate(new Date(new java.util.Date().getTime()));
             int dotIndex = paper.getFilePath().lastIndexOf(".");
             paper.setFormat(paper.getFilePath().substring(dotIndex));
+
+            MultipartFile cover = files.getFirst("coverFile");
+            if (cover != null) {
+                paper.setCoverPath(convert(cover, storePath).getName());
+            } else {
+                // need take cover from file (cover name same as PDF file name)
+                String name = params.get("name")[0].split(".")[0] + ".jpg";
+                File coverFile = new File(storePath + name);
+                //Writing the image to a file
+                ImageIO.write(pdfService.getCover(paperFile), "JPEG", coverFile);
+                System.out.println("Image created");
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
