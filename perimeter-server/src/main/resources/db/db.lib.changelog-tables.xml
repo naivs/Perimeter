@@ -113,5 +113,14 @@
             <column name="file_path" type="varchar(255)"/>
         </addColumn>
     </changeSet>
+    
+    <!--<changeSet id="table.6" author="NaIvS">-->
+        <!--<preConditions>-->
+            <!--<tableExists tableName="photo" schemaName="public"/>-->
+        <!--</preConditions>-->
+        <!--<createTable tableName="photo" schemaName="public">-->
+            <!--<column name=""></column>-->
+        <!--</createTable>-->
+    <!--</changeSet>-->
 
 </databaseChangeLog>

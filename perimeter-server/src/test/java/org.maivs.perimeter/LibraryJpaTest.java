@@ -4,14 +4,18 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.naivs.perimeter.Application;
 import org.naivs.perimeter.library.data.*;
+import org.naivs.perimeter.smarthome.rest.api.PaperController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.sql.Date;
 import java.util.List;
 
-@RunWith(SpringRunner.class)
+@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = Application.class)
 public class LibraryJpaTest {
 
@@ -79,6 +83,12 @@ public class LibraryJpaTest {
                 && paper.getCoverPath().equals(paperEntity.getCoverPath())
                 && paper.getFormat().equals(paperEntity.getFormat())
                 && paper.getLoadDate().getTime() == paperEntity.getLoadDate().getTime());
+    }
+
+    @Test
+    public void newTest() {
+        PaperController paperController = new PaperController();
+        paperController.getCover("test.jpg");
     }
 
     private AuthorEntity getTestAuthor() {
