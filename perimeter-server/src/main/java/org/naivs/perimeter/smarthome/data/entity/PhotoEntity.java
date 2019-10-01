@@ -3,12 +3,13 @@ package org.naivs.perimeter.smarthome.data.entity;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
 @Entity
 @Table(name = "photo", schema = "public")
-public class PhotoEntity implements Serializable {
+public class PhotoEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,8 +19,9 @@ public class PhotoEntity implements Serializable {
     private LocalDateTime timestamp;
     private LocalDateTime added;
     private String description;
-//    @OneToMany
-//    private Set<PhotoIndex> indexSet;
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "photo_id")
+    private Set<PhotoIndex> indexes = new HashSet<>();
 
     public PhotoEntity() {
     }
@@ -76,13 +78,13 @@ public class PhotoEntity implements Serializable {
         this.description = description;
     }
 
-//    public Set<PhotoIndex> getIndexSet() {
-//        return indexSet;
-//    }
-//
-//    public void setIndexSet(Set<PhotoIndex> indexSet) {
-//        this.indexSet = indexSet;
-//    }
+    public Set<PhotoIndex> getIndexes() {
+        return indexes;
+    }
+
+    public void setIndexes(Set<PhotoIndex> indexes) {
+        this.indexes = indexes;
+    }
 
     @Override
     public String toString() {

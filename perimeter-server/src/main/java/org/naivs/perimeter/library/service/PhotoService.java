@@ -2,7 +2,7 @@ package org.naivs.perimeter.library.service;
 
 import org.naivs.perimeter.smarthome.data.entity.Catalog;
 import org.naivs.perimeter.smarthome.data.entity.PhotoEntity;
-import org.naivs.perimeter.smarthome.data.repository.CatalogRepository;
+import org.naivs.perimeter.smarthome.data.entity.PhotoIndex;
 import org.naivs.perimeter.smarthome.data.repository.PhotoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,15 +28,16 @@ public class PhotoService {
     @Value("${photo.catalog}")
     private String photoBasePath;
     private final PhotoRepository photoRepository;
-    private final CatalogRepository catalogRepository;
 
     private Random random = new Random();
 
     @Autowired
-    public PhotoService(PhotoRepository photoRepository,
-                        CatalogRepository catalogRepository) {
+    public PhotoService(PhotoRepository photoRepository) {
         this.photoRepository = photoRepository;
-        this.catalogRepository = catalogRepository;
+    }
+
+    public void addPhoto(PhotoEntity photo) {
+        photoRepository.saveAndFlush(photo);
     }
 
     public File getRandomPhoto() {
@@ -71,13 +72,23 @@ public class PhotoService {
                             }
                         }).forEach(file -> {
                             try {
+                                String filePath = file.toAbsolutePath().toString();
                                 BasicFileAttributes attributes = Files.readAttributes(file, BasicFileAttributes.class);
                                 PhotoEntity photo = new PhotoEntity();
                                 photo.setName(file.getFileName().toString());
                                 photo.setTimestamp(LocalDateTime.ofInstant(attributes.creationTime().toInstant(), ZoneId.systemDefault()));
                                 photo.setAdded(LocalDateTime.now());
-                                photo.setPath(file.toAbsolutePath().toString());
+                                photo.setPath(filePath);
 
+                                String[] indexNames = filePath.substring(
+                                        catalog.length(),
+                                        filePath.length() - file.getFileName().toString().length())
+                                        .split("/");
+                                for (String index : indexNames) {
+                                    PhotoIndex photoIndex = new PhotoIndex();
+                                    photoIndex.setName(index);
+                                    photo.getIndexes().add(photoIndex);
+                                }
                                 photoRepository.saveAndFlush(photo);
                             } catch (IOException e) {
                                 e.printStackTrace();
@@ -138,11 +149,5 @@ public class PhotoService {
         } else {
             throw new RuntimeException("Unable to create catalog " + catalog.getName());
         }
-    }
-
-    public void saveCatalog() {
-        Catalog catalog = new Catalog();
-        catalog.setName("TestCatalog");
-        catalogRepository.saveAndFlush(catalog);
     }
 }
