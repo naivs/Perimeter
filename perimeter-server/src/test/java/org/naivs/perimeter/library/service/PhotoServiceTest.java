@@ -23,7 +23,7 @@ public class PhotoServiceTest {
 
     @Test
     public void scanAndPersist() {
-        photoService.scanAndPersist("/home/ivan-naumov/photobase");
+        photoService.scanAndPersist();
     }
 
     @Test

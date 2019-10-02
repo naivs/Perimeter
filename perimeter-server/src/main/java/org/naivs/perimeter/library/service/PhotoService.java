@@ -1,6 +1,5 @@
 package org.naivs.perimeter.library.service;
 
-import org.naivs.perimeter.smarthome.data.entity.Catalog;
 import org.naivs.perimeter.smarthome.data.entity.PhotoEntity;
 import org.naivs.perimeter.smarthome.data.entity.PhotoIndex;
 import org.naivs.perimeter.smarthome.data.repository.PhotoRepository;
@@ -18,9 +17,8 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Random;
 
 @Service
 public class PhotoService {
@@ -57,8 +55,8 @@ public class PhotoService {
         return fileList.get(random.nextInt(fileList.size()));
     }
 
-    public void scanAndPersist(String catalog) {
-        File folder = new File(catalog);
+    public void scanAndPersist() {
+        File folder = new File(photoBasePath);
 
         try {
             if (folder.exists() && folder.isDirectory()) {
@@ -74,21 +72,30 @@ public class PhotoService {
                             try {
                                 String filePath = file.toAbsolutePath().toString();
                                 BasicFileAttributes attributes = Files.readAttributes(file, BasicFileAttributes.class);
-                                PhotoEntity photo = new PhotoEntity();
+                                PhotoEntity photo = photoRepository
+                                        .findPhotoEntityByNameAndPath(file.getFileName().toString(), filePath)
+                                        .orElse(new PhotoEntity());
                                 photo.setName(file.getFileName().toString());
-                                photo.setTimestamp(LocalDateTime.ofInstant(attributes.creationTime().toInstant(), ZoneId.systemDefault()));
+                                photo.setTimestamp(
+                                        LocalDateTime.ofInstant(
+                                                attributes.creationTime().toInstant(), ZoneId.systemDefault()));
                                 photo.setAdded(LocalDateTime.now());
-                                photo.setPath(filePath);
+                                photo.setPath(filePath); // todo: path without filename
 
-                                String[] indexNames = filePath.substring(
-                                        catalog.length(),
-                                        filePath.length() - file.getFileName().toString().length())
-                                        .split("/");
-                                for (String index : indexNames) {
+                                Path withoutBase = folder.toPath().relativize(file.getParent());
+                                if (!withoutBase.toString().isEmpty() && !withoutBase.toString().contains("/")) {
                                     PhotoIndex photoIndex = new PhotoIndex();
-                                    photoIndex.setName(index);
+                                    photoIndex.setName(withoutBase.toString());
                                     photo.getIndexes().add(photoIndex);
+                                } else if (withoutBase.toString().contains("/")){
+                                    String[] indexNames = withoutBase.toString().split("[/]");
+                                    for (String index : indexNames) {
+                                        PhotoIndex photoIndex = new PhotoIndex();
+                                        photoIndex.setName(index);
+                                        photo.getIndexes().add(photoIndex);
+                                    }
                                 }
+
                                 photoRepository.saveAndFlush(photo);
                             } catch (IOException e) {
                                 e.printStackTrace();
