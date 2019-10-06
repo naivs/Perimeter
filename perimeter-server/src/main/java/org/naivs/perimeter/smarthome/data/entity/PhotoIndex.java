@@ -11,7 +11,8 @@ public class PhotoIndex {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "photo_index")
     private PhotoEntity photo;
     @NotNull
     private String name;

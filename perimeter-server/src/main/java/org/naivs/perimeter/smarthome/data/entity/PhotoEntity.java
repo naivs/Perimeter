@@ -19,8 +19,7 @@ public class PhotoEntity {
     private LocalDateTime timestamp;
     private LocalDateTime added;
     private String description;
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "photo_id")
+    @OneToMany(mappedBy = "photo", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<PhotoIndex> indexes = new HashSet<>();
 
     public PhotoEntity() {
