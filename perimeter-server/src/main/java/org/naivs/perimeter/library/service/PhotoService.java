@@ -86,12 +86,14 @@ public class PhotoService {
                                 if (!withoutBase.toString().isEmpty() && !withoutBase.toString().contains("/")) {
                                     PhotoIndex photoIndex = new PhotoIndex();
                                     photoIndex.setName(withoutBase.toString());
+                                    photoIndex.setPhoto(photo);
                                     photo.getIndexes().add(photoIndex);
                                 } else if (withoutBase.toString().contains("/")){
                                     String[] indexNames = withoutBase.toString().split("[/]");
                                     for (String index : indexNames) {
                                         PhotoIndex photoIndex = new PhotoIndex();
                                         photoIndex.setName(index);
+                                        photoIndex.setPhoto(photo);
                                         photo.getIndexes().add(photoIndex);
                                     }
                                 }
