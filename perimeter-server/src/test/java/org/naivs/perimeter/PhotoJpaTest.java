@@ -14,7 +14,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -47,22 +49,43 @@ public class PhotoJpaTest {
             PhotoEntity finded = photoRepository
                     .findPhotoEntityByNameAndPath(stored.getName(), stored.getPath()).orElse(null);
             assertNotNull("Element " + i, finded);
-            assertEquals("Element " + i + "(full eq)", stored, finded);
+            assertEquals("Element " + i + " (full eq)", stored, finded);
 
-            assertEquals("Element " + i + "(id eq)", stored.getId(), finded.getId());
-            assertEquals("Element " + i + "(name eq)", stored.getName(), finded.getName());
-            assertEquals("Element " + i + "(path eq)", stored.getPath(), finded.getPath());
-            assertEquals("Element " + i + "(added eq)", stored.getAdded(), finded.getAdded());
-            assertEquals("Element " + i + "(timestamp eq)", stored.getTimestamp(), finded.getTimestamp());
-            assertEquals("Element " + i + "(description eq)", stored.getDescription(), finded.getDescription());
-            assertEquals("Element " + i + "(indexes eq)", stored.getIndexes(), finded.getIndexes());
+            assertEquals("Element " + i + " (id eq)", stored.getId(), finded.getId());
+            assertEquals("Element " + i + " (name eq)", stored.getName(), finded.getName());
+            assertEquals("Element " + i + " (path eq)", stored.getPath(), finded.getPath());
+            assertEquals("Element " + i + " (added eq)", stored.getAdded(), finded.getAdded());
+            assertEquals("Element " + i + " (timestamp eq)", stored.getTimestamp(), finded.getTimestamp());
+            assertEquals("Element " + i + " (description eq)", stored.getDescription(), finded.getDescription());
+
+            stored.getIndexes().forEach(storedIndex -> assertTrue(finded.getIndexes().stream().anyMatch(storedIndex::equals)));
+//            assertEquals("Element " + i + " (indexes eq)", stored.getIndexes(), finded.getIndexes());
         }
+    }
+
+    @Test
+    public void saveCascadeCheck() {
+        PhotoEntity saved = photoRepository.saveAndFlush(generatePhotoEntity());
+        entityManager.flush();
+        PhotoEntity finded = photoRepository.findById(saved.getId()).orElse(new PhotoEntity());
+
+        assertNotNull(finded.getIndexes());
+        finded.getIndexes().forEach(findedIndex -> {
+            assertNotNull(findedIndex.getId());
+            assertNotNull(findedIndex.getName());
+//            assertNotNull(findedIndex.getPhoto().getId());
+        });
+    }
+
+    @Test
+    public void delete() {
+
     }
 
     private PhotoEntity generatePhotoEntity() {
         PhotoEntity photoEntity = new PhotoEntity();
-        photoEntity.setName("photo_" + random.nextInt(1000));
-        photoEntity.setPath(ROOT + randomPath(random.nextInt(3)));
+        photoEntity.setName("photo_" + random.nextInt(1000) + ".jpg");
+        photoEntity.setPath(ROOT + randomPath(random.nextInt(3)) + photoEntity.getName());
         photoEntity.setAdded(LocalDateTime.now());
         photoEntity.setTimestamp(LocalDateTime.of(
                 random.nextInt(2019) + 1,
@@ -89,6 +112,6 @@ public class PhotoJpaTest {
             stringBuilder.append(random.nextInt(1000));
             stringBuilder.append("/");
         }
-        return stringBuilder.toString().substring(0, stringBuilder.length());
+        return stringBuilder.toString();
     }
 }

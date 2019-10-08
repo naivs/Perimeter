@@ -9,4 +9,6 @@ import java.util.Optional;
 public interface PhotoRepository extends JpaRepository<PhotoEntity, Long> {
 
     Optional<PhotoEntity> findPhotoEntityByNameAndPath(String name, String path);
+
+    Optional<PhotoEntity> findByPath(String path);
 }

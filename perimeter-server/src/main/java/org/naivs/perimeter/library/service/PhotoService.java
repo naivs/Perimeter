@@ -34,6 +34,10 @@ public class PhotoService {
         this.photoRepository = photoRepository;
     }
 
+    public PhotoEntity getPhoto(Path path) throws Exception {
+        return photoRepository.findByPath(path.toString()).orElseThrow(() -> new Exception("Not found"));
+    }
+
     public void addPhoto(PhotoEntity photo) {
         photoRepository.saveAndFlush(photo);
     }
@@ -80,20 +84,20 @@ public class PhotoService {
                                         LocalDateTime.ofInstant(
                                                 attributes.creationTime().toInstant(), ZoneId.systemDefault()));
                                 photo.setAdded(LocalDateTime.now());
-                                photo.setPath(filePath); // todo: path without filename
+                                photo.setPath(filePath);
 
                                 Path withoutBase = folder.toPath().relativize(file.getParent());
                                 if (!withoutBase.toString().isEmpty() && !withoutBase.toString().contains("/")) {
                                     PhotoIndex photoIndex = new PhotoIndex();
                                     photoIndex.setName(withoutBase.toString());
-                                    photoIndex.setPhoto(photo);
+//                                    photoIndex.setPhoto(photo);
                                     photo.getIndexes().add(photoIndex);
                                 } else if (withoutBase.toString().contains("/")){
                                     String[] indexNames = withoutBase.toString().split("[/]");
                                     for (String index : indexNames) {
                                         PhotoIndex photoIndex = new PhotoIndex();
                                         photoIndex.setName(index);
-                                        photoIndex.setPhoto(photo);
+//                                        photoIndex.setPhoto(photo);
                                         photo.getIndexes().add(photoIndex);
                                     }
                                 }

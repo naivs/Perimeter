@@ -1,11 +1,9 @@
 package org.naivs.perimeter.smarthome.data.entity;
 
 import javax.persistence.*;
+import java.lang.reflect.Array;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "photo", schema = "public")
@@ -15,11 +13,14 @@ public class PhotoEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+
+    @Column(unique = true)
     private String path;
     private LocalDateTime timestamp;
     private LocalDateTime added;
     private String description;
-    @OneToMany(mappedBy = "photo", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "photo_index_id")
     private Set<PhotoIndex> indexes = new HashSet<>();
 
     public PhotoEntity() {
@@ -99,13 +100,14 @@ public class PhotoEntity {
         return Objects.hash(name, path);
     }
 
-    @Override
-    public String toString() {
-        return "PhotoEntity{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", path='" + path + '\'' +
-                ", added=" + added +
-                '}';
-    }
+//    @Override
+//    public String toString() {
+//        return "PhotoEntity{" +
+//                "id=" + id +
+//                ", name='" + name + '\'' +
+//                ", path='" + path + '\'' +
+//                ", added=" + added +
+//                ", indexes=" + Arrays.toString(indexes.toArray(new PhotoIndex[0])) +
+//                '}';
+//    }
 }

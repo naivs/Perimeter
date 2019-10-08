@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -43,5 +46,18 @@ public class PhotoServiceTest {
 
 
         photoService.addPhoto(photo);
+    }
+
+    @Test
+    public void getPhoto() {
+        Path path = Paths.get("/home/ivan-naumov/photobase/persons/famous/Jason_Statham_2.jpg");
+
+        try {
+            PhotoEntity photoEntity = photoService.getPhoto(path);
+            assertNotNull(photoEntity);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
     }
 }
