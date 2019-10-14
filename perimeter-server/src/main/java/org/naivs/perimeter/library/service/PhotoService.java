@@ -12,6 +12,7 @@ import org.naivs.perimeter.exception.PhotoServiceException;
 import org.naivs.perimeter.smarthome.data.entity.Photo;
 import org.naivs.perimeter.smarthome.data.entity.PhotoIndex;
 import org.naivs.perimeter.smarthome.data.entity.Thumbnail;
+import org.naivs.perimeter.smarthome.data.repository.PhotoIndexRepository;
 import org.naivs.perimeter.smarthome.data.repository.PhotoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,12 +45,24 @@ public class PhotoService {
     @Value("${base.catalog}")
     private String baseCatalog;
     private final PhotoRepository photoRepository;
+    private final PhotoIndexRepository photoIndexRepository;
 
     private Random random = new Random();
 
     @Autowired
-    public PhotoService(PhotoRepository photoRepository) {
+    public PhotoService(PhotoRepository photoRepository, PhotoIndexRepository photoIndexRepository) {
         this.photoRepository = photoRepository;
+        this.photoIndexRepository = photoIndexRepository;
+    }
+
+    public File getPhoto(Long id) throws PhotoServiceException {
+        Photo photoMetadata = photoRepository
+                .findById(id).orElseThrow(() ->
+                        new PhotoServiceException(String.format("Photo with id=%d not found", id)));
+        return Paths.get(photoBasePath)
+                .resolve(photoMetadata.getPath())
+                .resolve(photoMetadata.getFilename())
+                .normalize().toFile();
     }
 
     /**
@@ -86,11 +99,11 @@ public class PhotoService {
 
     /**
      * Get all Photo objects which stored in database in "photo" table
-     * @param path string path of Photo ("path" column)
+     * @param index string index name of Photo
      * @return List of Photo objects
      */
-    public List<Photo> getPhotosFromDatabase(String path) {
-        return photoRepository.findByPath(Paths.get(path).normalize().toString());
+    public List<Photo> getPhotosFromDatabase(String index) {
+        return photoRepository.findByIndex(index);
     }
 
     /**
@@ -127,11 +140,20 @@ public class PhotoService {
                                  org.naivs.perimeter.smarthome.rest.to.Photo metadata
                                  //todo: *.to.Photo must not be used in this service layer (replace by *.entity.Photo)
     ) throws PhotoServiceException {
-        Path path = Paths.get(photoBasePath).resolve(convertIndexes2Path(metadata.getIndexes())).normalize();
-        File photoFile = Paths.get(photoBasePath).resolve(path).resolve(metadata.getFilename()).toFile();
+        Path relativeDir = Paths.get(convertIndexes2Path(metadata.getIndexes())).normalize();
+        Path photoDirPath = Paths.get(photoBasePath).resolve(relativeDir).normalize();
+        File photoDir = photoDirPath.toFile();
+
+        if (!photoDir.exists()) {
+            if (!photoDir.mkdirs())
+                throw new PhotoServiceException("Can't create directory: \"" + photoBasePath + "\"");
+        }
+
+        File photoFile = photoDirPath.resolve(metadata.getFilename()).toFile();
 
         try {
             if (photoFile.isAbsolute() && !photoFile.exists()) {
+
                 FileCopyUtils.copy(inputStream, Files.newOutputStream(photoFile.toPath(), StandardOpenOption.CREATE_NEW));
             }
         } catch (IOException e) {
@@ -140,12 +162,22 @@ public class PhotoService {
         }
 
         Photo photo = new Photo();
+        photo.setName(metadata.getName());
+        photo.setDescription(metadata.getDescription());
         photo.setFilename(metadata.getFilename());
-        photo.setPath(path.toString());
+        photo.setPath(relativeDir.toString());
         LocalDateTime timestamp = getTimestamp(photoFile);
         photo.setTimestamp(timestamp.plusMinutes(1).isAfter(metadata.getTimestamp()) ? metadata.getTimestamp() : timestamp);
 
         return saveToDatabase(photo);
+    }
+
+    /**
+     * Get all photo indexes
+     * @return List of founded indexes
+     */
+    public List<PhotoIndex> getIndexes() {
+        return photoIndexRepository.findAll();
     }
 
 //    public Photo getPhoto(Path path) throws Exception {
@@ -225,29 +257,6 @@ public class PhotoService {
         }
     }
 
-    // was test. Not need it now
-//    public void walk(File file) {
-//        if (!file.exists()) {
-//            throw new RuntimeException("File " + file.getAbsolutePath() + " is not exists");
-//        }
-//
-//        if (file.isDirectory()) {
-//            // persist directory
-//            System.out.println("Directory: " + file.getAbsolutePath());
-//            File[] files = file.listFiles();
-//            if (files == null) {
-//                return;
-//            }
-//
-//            for (File f : files) {
-//                walk(f);
-//            }
-//        } else {
-//            // process file
-//            System.out.println("File: " + file.getName());
-//        }
-//    }
-
     private void createThumb(Photo photo) throws IOException {
         Thumbnail thumbnail = new Thumbnail();
 
@@ -255,7 +264,7 @@ public class PhotoService {
                 Paths.get(photoBasePath).resolve(photo.getPath()).resolve(photo.getFilename()).toFile());
         int width = bufferedImage.getWidth(),
                 height = bufferedImage.getHeight();
-
+        //todo: image scaling must be perform in same size (not relatively to source size)
         BufferedImage output = new BufferedImage(width / 6, height / 6, bufferedImage.getType());
         output.createGraphics().drawImage(
                 bufferedImage.getScaledInstance(output.getWidth(), output.getHeight(), Image.SCALE_SMOOTH), 0, 0, null);
@@ -330,18 +339,5 @@ public class PhotoService {
             }
         }
         return path.toString();
-    }
-
-    public void addCatalog(Path path) {
-        File catalog = path.toFile();
-        if (catalog.exists()) {
-            throw new RuntimeException("Catalog " + catalog.getName() + " already exists");
-        }
-
-        if (catalog.mkdir()) {
-            System.out.println("Catalod " + catalog.getName() + " was created");
-        } else {
-            throw new RuntimeException("Unable to create catalog " + catalog.getName());
-        }
     }
 }

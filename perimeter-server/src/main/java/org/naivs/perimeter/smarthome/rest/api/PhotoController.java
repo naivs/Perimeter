@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import org.apache.commons.io.IOUtils;
 import org.naivs.perimeter.exception.PhotoServiceException;
 import org.naivs.perimeter.library.service.PhotoService;
+import org.naivs.perimeter.smarthome.data.entity.PhotoIndex;
 import org.naivs.perimeter.smarthome.rest.to.MultipartPhotoForm;
 import org.naivs.perimeter.smarthome.rest.to.Photo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ import java.io.*;
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping("photo")
+@RequestMapping("photo") //todo: Rest exceptions response
 public class PhotoController {
 
     private final PhotoService photoService;
@@ -25,6 +26,27 @@ public class PhotoController {
     @Autowired
     public PhotoController(PhotoService photoService) {
         this.photoService = photoService;
+    }
+
+    @RequestMapping(value = "index", method = RequestMethod.GET)
+    public PhotoIndex[] getAllIndexes() {
+        return photoService.getIndexes().toArray(new PhotoIndex[0]);
+    }
+
+    @RequestMapping(value = "index/{indexName}", method = RequestMethod.GET)
+    public org.naivs.perimeter.smarthome.data.entity.Photo[] getPhotos(@PathVariable String indexName) {
+        return photoService.getPhotosFromDatabase(indexName).toArray(new org.naivs.perimeter.smarthome.data.entity.Photo[0]);
+    }
+
+    @RequestMapping(value = "original/{id}", method = RequestMethod.GET)
+    public ResponseEntity<byte[]> getPhotoOriginal(@PathVariable Long id) throws PhotoServiceException {
+        try (InputStream in = new BufferedInputStream(new FileInputStream(photoService.getPhoto(id)))) {
+            byte[] media = IOUtils.toByteArray(in);
+            return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(media);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return ResponseEntity.badRequest().body(null);
     }
 
     @RequestMapping(value = "random", method = RequestMethod.GET)
@@ -39,19 +61,6 @@ public class PhotoController {
 
         return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(new byte[0]);
     }
-
-//    @RequestMapping(value = "catalog", method = RequestMethod.POST)
-//    public String addCatalog(@RequestBody String name) {
-//        photoService.addCatalog(Paths.get(libraryDir + "/" + name));
-//        return Paths.get(libraryDir + "/" + name).toString();
-//    }
-    /*
-    random photo
-    concrete photo
-    photos of dir (pageable)
-    list dir
-
-     */
 
     @RequestMapping(value = "scan", method = RequestMethod.GET)
     public String scan() {
@@ -78,7 +87,7 @@ public class PhotoController {
             if (metadataItem.getTimestamp() == null) {
                 metadataItem.setTimestamp(LocalDateTime.now());
             }
-
+            //todo: if throws PSQL Ex files will be save, but not query (needs transactional operation)
             photoService.saveToPhotobase(multipartFile.getInputStream(), metadataItem);
             index++;
         }

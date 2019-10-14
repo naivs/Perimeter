@@ -6,9 +6,12 @@ import java.util.Arrays;
 public class Photo {
     private String name;
     private String filename;
+    private String path;
     private String description;
     private String[] indexes;
     private LocalDateTime timestamp;
+    private LocalDateTime added;
+    private String thumbnailName;
 
     public Photo() {
     }
@@ -51,6 +54,30 @@ public class Photo {
 
     public void setFilename(String filename) {
         this.filename = filename;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public LocalDateTime getAdded() {
+        return added;
+    }
+
+    public void setAdded(LocalDateTime added) {
+        this.added = added;
+    }
+
+    public String getThumbnailName() {
+        return thumbnailName;
+    }
+
+    public void setThumbnailName(String thumbnailName) {
+        this.thumbnailName = thumbnailName;
     }
 
     @Override

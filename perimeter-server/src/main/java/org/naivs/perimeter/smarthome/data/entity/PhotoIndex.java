@@ -55,12 +55,11 @@ public class PhotoIndex {
         return Objects.hash(name, description);
     }
 
-    //    @Override
-//    public String toString() {
-//        return "PhotoIndex{" +
-//                "id=" + id +
-////                ", photo=" + (photo != null ? String.valueOf(photo.getId()) : null) +
-//                ", name='" + name + '\'' +
-//                '}';
-//    }
+    @Override
+    public String toString() {
+        return "PhotoIndex{" +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                '}';
+    }
 }
