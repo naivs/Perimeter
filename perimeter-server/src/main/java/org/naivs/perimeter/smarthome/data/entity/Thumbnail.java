@@ -1,44 +1,47 @@
 package org.naivs.perimeter.smarthome.data.entity;
 
 import javax.persistence.*;
-import java.io.Serializable;
+import java.util.Objects;
 
 @Entity
-@Table(name = "thumbnail", schema = "public")
-public class Thumbnail implements Serializable {
+@Table(name = "thumbnail")
+public class Thumbnail {
 
     @Id
-    private String uuid;
-    private String name;
-//    @Column(name = "photo_id")
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-//    @JoinColumn(name = "id")
-    private PhotoEntity photoEntity;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(nullable = false)
+    private String fileName;
 
     public Thumbnail() {
     }
 
-    public String getUuid() {
-        return uuid;
+    public Long getId() {
+        return id;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getFileName() {
+        return fileName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
-    public PhotoEntity getPhotoEntity() {
-        return photoEntity;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Thumbnail thumbnail = (Thumbnail) o;
+        return Objects.equals(fileName, thumbnail.fileName);
     }
 
-    public void setPhotoEntity(PhotoEntity photoEntity) {
-        this.photoEntity = photoEntity;
+    @Override
+    public int hashCode() {
+        return Objects.hash(fileName);
     }
 }

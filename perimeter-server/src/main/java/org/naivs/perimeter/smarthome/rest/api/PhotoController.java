@@ -1,25 +1,25 @@
 package org.naivs.perimeter.smarthome.rest.api;
 
+import com.google.gson.Gson;
 import org.apache.commons.io.IOUtils;
+import org.naivs.perimeter.exception.PhotoServiceException;
 import org.naivs.perimeter.library.service.PhotoService;
+import org.naivs.perimeter.smarthome.rest.to.MultipartPhotoForm;
+import org.naivs.perimeter.smarthome.rest.to.Photo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.nio.file.Paths;
+import java.io.*;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("photo")
 public class PhotoController {
 
-    @Value("${photo.catalog}")
-    private String libraryDir;
     private final PhotoService photoService;
 
     @Autowired
@@ -40,11 +40,11 @@ public class PhotoController {
         return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(new byte[0]);
     }
 
-    @RequestMapping(value = "catalog", method = RequestMethod.POST)
-    public String addCatalog(@RequestBody String name) {
-        photoService.addCatalog(Paths.get(libraryDir + "/" + name));
-        return Paths.get(libraryDir + "/" + name).toString();
-    }
+//    @RequestMapping(value = "catalog", method = RequestMethod.POST)
+//    public String addCatalog(@RequestBody String name) {
+//        photoService.addCatalog(Paths.get(libraryDir + "/" + name));
+//        return Paths.get(libraryDir + "/" + name).toString();
+//    }
     /*
     random photo
     concrete photo
@@ -55,7 +55,33 @@ public class PhotoController {
 
     @RequestMapping(value = "scan", method = RequestMethod.GET)
     public String scan() {
-        photoService.walk(new File(libraryDir));
+//        photoService.walk(new File(libraryDir));
         return "OK";
+    }
+
+    @RequestMapping(method = RequestMethod.POST)
+    public String addPhotos(
+            @ModelAttribute("multipartPhotoForm") MultipartPhotoForm multipartPhotoForm
+    ) throws IOException, PhotoServiceException {
+        String metadata = multipartPhotoForm.getMetadata();
+        Gson g = new Gson();
+        Photo[] photos = g.fromJson(metadata, Photo[].class);
+
+        Assert.isTrue(photos.length == multipartPhotoForm.getFiles().length,
+                String.format("Wrong metadata count (expected:%d, actual:%d)",
+                        multipartPhotoForm.getFiles().length, photos.length));
+
+        int index = 0;
+        for (MultipartFile multipartFile : multipartPhotoForm.getFiles()) {
+            Photo metadataItem = photos[index];
+            metadataItem.setFilename(multipartFile.getOriginalFilename());
+            if (metadataItem.getTimestamp() == null) {
+                metadataItem.setTimestamp(LocalDateTime.now());
+            }
+
+            photoService.saveToPhotobase(multipartFile.getInputStream(), metadataItem);
+            index++;
+        }
+        return multipartPhotoForm.toString();
     }
 }

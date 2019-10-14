@@ -1,18 +1,18 @@
 package org.naivs.perimeter.smarthome.data.entity;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 @Entity
-@Table(name = "photo_index", schema = "public")
+@Table(name = "photo_index")
 public class PhotoIndex {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotNull
+    @Column(nullable = false)
     private String name;
+    private String description;
 
     public PhotoIndex() {
     }
@@ -33,21 +33,29 @@ public class PhotoIndex {
         this.name = name;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PhotoIndex that = (PhotoIndex) o;
-        return Objects.equals(id, that.id) &&
-                Objects.equals(name, that.name);
+        return Objects.equals(name, that.name) &&
+                Objects.equals(description, that.description);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name);
+        return Objects.hash(name, description);
     }
 
-//    @Override
+    //    @Override
 //    public String toString() {
 //        return "PhotoIndex{" +
 //                "id=" + id +

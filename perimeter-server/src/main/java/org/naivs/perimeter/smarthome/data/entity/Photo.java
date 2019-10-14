@@ -1,33 +1,41 @@
 package org.naivs.perimeter.smarthome.data.entity;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import javax.persistence.*;
-import java.lang.reflect.Array;
 import java.time.LocalDateTime;
 import java.util.*;
 
 @Entity
-@Table(name = "photo", schema = "public")
-public class PhotoEntity {
+@Table(
+        name = "photo",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"filename", "path"})
+)
+public class Photo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
     private String name;
-
-    @Column(unique = true)
+    @Column(nullable = false)
+    private String filename;
+    @Column(nullable = false)
     private String path;
+    @Column(nullable = false)
     private LocalDateTime timestamp;
+    @Column(nullable = false)
+    @CreationTimestamp
     private LocalDateTime added;
     private String description;
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "photo_index_id")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable
     private Set<PhotoIndex> indexes = new HashSet<>();
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "thumbnail_id", nullable = false)
+    private Thumbnail thumbnail;
 
-    public PhotoEntity() {
-    }
-
-    public String generateUuid() {
-        return UUID.fromString(this.toString()).toString();
+    public Photo() {
     }
 
     public Long getId() {
@@ -86,23 +94,46 @@ public class PhotoEntity {
         this.indexes = indexes;
     }
 
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
+
+    public Thumbnail getThumbnail() {
+        return thumbnail;
+    }
+
+    public void setThumbnail(Thumbnail thumbnail) {
+        this.thumbnail = thumbnail;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        PhotoEntity that = (PhotoEntity) o;
-        return Objects.equals(name, that.name) &&
-                Objects.equals(path, that.path);
+        Photo photo = (Photo) o;
+        return Objects.equals(name, photo.name) &&
+                Objects.equals(filename, photo.filename) &&
+                Objects.equals(path, photo.path) &&
+                Objects.equals(timestamp, photo.timestamp) &&
+                Objects.equals(description, photo.description);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, path);
+        return Objects.hash(name, filename, path, timestamp, description);
+    }
+
+    public String getUuid() {
+        return UUID.nameUUIDFromBytes(("Photo-" + path + filename + timestamp).getBytes()).toString();
     }
 
 //    @Override
 //    public String toString() {
-//        return "PhotoEntity{" +
+//        return "Photo{" +
 //                "id=" + id +
 //                ", name='" + name + '\'' +
 //                ", path='" + path + '\'' +

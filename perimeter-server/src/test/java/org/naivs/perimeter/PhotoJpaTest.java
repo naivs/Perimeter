@@ -3,8 +3,9 @@ package org.naivs.perimeter;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.naivs.perimeter.smarthome.data.entity.PhotoEntity;
+import org.naivs.perimeter.smarthome.data.entity.Photo;
 import org.naivs.perimeter.smarthome.data.entity.PhotoIndex;
+import org.naivs.perimeter.smarthome.data.entity.Thumbnail;
 import org.naivs.perimeter.smarthome.data.repository.PhotoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -14,7 +15,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
@@ -33,20 +33,20 @@ public class PhotoJpaTest {
     private Random random = new Random();
     private static final String ROOT = "/home/user/photobase";
 
-    private List<PhotoEntity> photoEntityList = new ArrayList<>();
+    private List<Photo> photoList = new ArrayList<>();
 
     @Before
     public void setup() {
         for (int i = 0; i < 10; i++) {
-            photoEntityList.add(entityManager.persistAndFlush(generatePhotoEntity()));
+            photoList.add(entityManager.persistAndFlush(generatePhotoEntity()));
         }
     }
 
     @Test
     public void findPhotoEntityByNameAndPath() {
-        for (int i = 0; i < photoEntityList.size(); i++) {
-            PhotoEntity stored = photoEntityList.get(i);
-            PhotoEntity finded = photoRepository
+        for (int i = 0; i < photoList.size(); i++) {
+            Photo stored = photoList.get(i);
+            Photo finded = photoRepository
                     .findPhotoEntityByNameAndPath(stored.getName(), stored.getPath()).orElse(null);
             assertNotNull("Element " + i, finded);
             assertEquals("Element " + i + " (full eq)", stored, finded);
@@ -65,9 +65,9 @@ public class PhotoJpaTest {
 
     @Test
     public void saveCascadeCheck() {
-        PhotoEntity saved = photoRepository.saveAndFlush(generatePhotoEntity());
+        Photo saved = photoRepository.saveAndFlush(generatePhotoEntity());
         entityManager.flush();
-        PhotoEntity finded = photoRepository.findById(saved.getId()).orElse(new PhotoEntity());
+        Photo finded = photoRepository.findById(saved.getId()).orElse(new Photo());
 
         assertNotNull(finded.getIndexes());
         finded.getIndexes().forEach(findedIndex -> {
@@ -82,22 +82,27 @@ public class PhotoJpaTest {
 
     }
 
-    private PhotoEntity generatePhotoEntity() {
-        PhotoEntity photoEntity = new PhotoEntity();
-        photoEntity.setName("photo_" + random.nextInt(1000) + ".jpg");
-        photoEntity.setPath(ROOT + randomPath(random.nextInt(3)) + photoEntity.getName());
-        photoEntity.setAdded(LocalDateTime.now());
-        photoEntity.setTimestamp(LocalDateTime.of(
+    private Photo generatePhotoEntity() {
+        Photo photo = new Photo();
+        photo.setName("photo_" + random.nextInt(1000));
+        photo.setFilename(photo.getName() + ".jpg");
+        photo.setPath(ROOT + randomPath(random.nextInt(3)) + photo.getName());
+//        photo.setAdded(LocalDateTime.now());
+        photo.setTimestamp(LocalDateTime.of(
                 random.nextInt(2019) + 1,
                 random.nextInt(12) + 1,
                 random.nextInt(29) + 1, 1, 1));
-        photoEntity.setDescription("test photo description " + random.nextInt(1000));
+        photo.setDescription("test photo description " + random.nextInt(1000));
 
         int indexCount = random.nextInt(3) + 1;
         for (int i = 0; i < indexCount; i++) {
-            photoEntity.getIndexes().add(generatePhotoIndex());
+            photo.getIndexes().add(generatePhotoIndex());
         }
-        return photoEntity;
+
+        Thumbnail thumbnail = new Thumbnail();
+        thumbnail.setFileName("thumb.jpg");
+        photo.setThumbnail(thumbnail);
+        return photo;
     }
 
     private PhotoIndex generatePhotoIndex() {

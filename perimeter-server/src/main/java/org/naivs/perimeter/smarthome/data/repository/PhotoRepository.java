@@ -1,14 +1,14 @@
 package org.naivs.perimeter.smarthome.data.repository;
 
-import org.naivs.perimeter.smarthome.data.entity.PhotoEntity;
+import org.naivs.perimeter.smarthome.data.entity.Photo;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
-public interface PhotoRepository extends JpaRepository<PhotoEntity, Long> {
+public interface PhotoRepository extends JpaRepository<Photo, Long> {
 
-    Optional<PhotoEntity> findPhotoEntityByNameAndPath(String name, String path);
+    Optional<Photo> findPhotoEntityByNameAndPath(String name, String path);
 
-    Optional<PhotoEntity> findByPath(String path);
+    List<Photo> findByPath(String path);
 }
