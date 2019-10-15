@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.naivs.perimeter.smarthome.data.entity.Photo;
 import org.naivs.perimeter.smarthome.data.entity.PhotoIndex;
-import org.naivs.perimeter.smarthome.data.entity.Thumbnail;
 import org.naivs.perimeter.smarthome.data.repository.PhotoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -47,7 +46,7 @@ public class PhotoJpaTest {
         for (int i = 0; i < photoList.size(); i++) {
             Photo stored = photoList.get(i);
             Photo finded = photoRepository
-                    .findPhotoEntityByNameAndPath(stored.getName(), stored.getPath()).orElse(null);
+                    .findPhotoByFilenameAndPath(stored.getName(), stored.getPath()).orElse(null);
             assertNotNull("Element " + i, finded);
             assertEquals("Element " + i + " (full eq)", stored, finded);
 
@@ -99,9 +98,7 @@ public class PhotoJpaTest {
             photo.getIndexes().add(generatePhotoIndex());
         }
 
-        Thumbnail thumbnail = new Thumbnail();
-        thumbnail.setFileName("thumb.jpg");
-        photo.setThumbnail(thumbnail);
+        photo.setThumbnail("thumb.jpg");
         return photo;
     }
 

@@ -28,14 +28,21 @@ public class Photo {
     @CreationTimestamp
     private LocalDateTime added;
     private String description;
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinTable
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "photo_indexes",
+            joinColumns = @JoinColumn(name = "photo_id"),
+            inverseJoinColumns = @JoinColumn(name = "photo_index_id")
+    )
     private Set<PhotoIndex> indexes = new HashSet<>();
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "thumbnail_id", nullable = false)
-    private Thumbnail thumbnail;
+    @Column(name = "thumbnail", nullable = false)
+    private String thumbnail;
 
     public Photo() {
+        PhotoIndex photoIndex = new PhotoIndex();
+        photoIndex.setName("root");
+        photoIndex.setDescription("Index for photos in root catalog");
+        indexes.add(photoIndex);
     }
 
     public Long getId() {
@@ -102,11 +109,11 @@ public class Photo {
         this.filename = filename;
     }
 
-    public Thumbnail getThumbnail() {
+    public String getThumbnail() {
         return thumbnail;
     }
 
-    public void setThumbnail(Thumbnail thumbnail) {
+    public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
     }
 
@@ -128,6 +135,7 @@ public class Photo {
     }
 
     public String getUuid() {
+        //todo: timestamp evolve only not file system timestamp. Also needs size or checksum
         return UUID.nameUUIDFromBytes(("Photo-" + path + filename + timestamp).getBytes()).toString();
     }
 

@@ -35,7 +35,7 @@ public class PhotoServiceTest {
     @Test
     public void getPhotosFromStorage() {
         try {
-            List<Photo> photoList = photoService.getPhotosFromStorage(Paths.get("."));
+            List<Photo> photoList = photoService.getPhotosMetadataFromStorage(Paths.get("."));
             assertNotNull(photoList);
             assertTrue(photoList.size() > 0);
             photoList.forEach(photo -> {
@@ -75,8 +75,8 @@ public class PhotoServiceTest {
         assertEquals(photo.getPath(), saved.getPath());
         assertEquals(photo.getTimestamp(), saved.getTimestamp());
         assertTrue(saved.getAdded().minusSeconds(5).isBefore(saved.getAdded()));
-        assertEquals(photo.getUuid(), saved.getThumbnail().getFileName()
-                .substring(0, saved.getThumbnail().getFileName().lastIndexOf('.')));
+        assertEquals(photo.getUuid(), saved.getThumbnail()
+                .substring(0, saved.getThumbnail().lastIndexOf('.')));
         assertEquals(photo.getDescription(), saved.getDescription());
         assertEquals(photo.getName(), saved.getName());
         assertNotNull(saved.getIndexes());

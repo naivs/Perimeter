@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface PhotoRepository extends JpaRepository<Photo, Long> {
 
-    Optional<Photo> findPhotoEntityByNameAndPath(String name, String path);
+    Optional<Photo> findPhotoByFilenameAndPath(String name, String path);
 
     @Query(value = "SELECT * " +
             "FROM public.photo p " +

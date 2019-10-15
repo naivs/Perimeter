@@ -22,6 +22,14 @@ public class SyncService {
         this.photoService = photoService;
     }
 
+    public void syncPhoto() {
+        List<Photo> storagePhotos = new ArrayList<>();
+        List<File> catalogs = new ArrayList<>();
+
+
+    }
+
+
 //    public void syncPhoto() throws Exception {
 //        syncPhoto(Paths.get(photoBasePath));
 //    }

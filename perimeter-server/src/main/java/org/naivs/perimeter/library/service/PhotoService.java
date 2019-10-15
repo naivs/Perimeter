@@ -8,10 +8,10 @@ import com.drew.metadata.exif.ExifDirectoryBase;
 import com.drew.metadata.exif.ExifIFD0Directory;
 import com.drew.metadata.exif.ExifSubIFDDirectory;
 import com.drew.metadata.file.FileSystemDirectory;
+import org.naivs.perimeter.converter.AbstractConverter;
 import org.naivs.perimeter.exception.PhotoServiceException;
 import org.naivs.perimeter.smarthome.data.entity.Photo;
 import org.naivs.perimeter.smarthome.data.entity.PhotoIndex;
-import org.naivs.perimeter.smarthome.data.entity.Thumbnail;
 import org.naivs.perimeter.smarthome.data.repository.PhotoIndexRepository;
 import org.naivs.perimeter.smarthome.data.repository.PhotoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +36,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PhotoService {
@@ -46,31 +47,64 @@ public class PhotoService {
     private String baseCatalog;
     private final PhotoRepository photoRepository;
     private final PhotoIndexRepository photoIndexRepository;
+    private final AbstractConverter converter;
 
     private Random random = new Random();
 
     @Autowired
-    public PhotoService(PhotoRepository photoRepository, PhotoIndexRepository photoIndexRepository) {
+    public PhotoService(PhotoRepository photoRepository,
+                        PhotoIndexRepository photoIndexRepository,
+                        AbstractConverter converter) {
         this.photoRepository = photoRepository;
         this.photoIndexRepository = photoIndexRepository;
-    }
-
-    public File getPhoto(Long id) throws PhotoServiceException {
-        Photo photoMetadata = photoRepository
-                .findById(id).orElseThrow(() ->
-                        new PhotoServiceException(String.format("Photo with id=%d not found", id)));
-        return Paths.get(photoBasePath)
-                .resolve(photoMetadata.getPath())
-                .resolve(photoMetadata.getFilename())
-                .normalize().toFile();
+        this.converter = converter;
     }
 
     /**
-     * Get all photos from specified catalog. Catalog specify relative to base storage catalog
-     * @param path relative catalog path
-     * @return List of Photo objects
+     * Get file of original photo. Uses for obtain photo from storage and receive over http.
+     * @param photo photo entity with photo metadata
+     * @return original photo file
+     * @throws PhotoServiceException throws if file not registered in database or
+     * if file not exists in storage or if not a file
      */
-    public List<Photo> getPhotosFromStorage(Path path) throws PhotoServiceException {
+    public File getOriginalFile(Photo photo) throws PhotoServiceException {
+        photoRepository.findPhotoByFilenameAndPath(photo.getFilename(), photo.getPath()).orElseThrow(() ->
+                        new PhotoServiceException(
+                                String.format("Photo with relative=%s and name=%s not found",
+                                        photo.getPath(),
+                                        photo.getFilename())));
+        File originalPhoto = Paths.get(photoBasePath)
+                .resolve(photo.getPath())
+                .resolve(photo.getFilename())
+                .normalize().toFile();
+        if (!originalPhoto.exists() || !originalPhoto.isFile()) {
+            throw new PhotoServiceException(String.format("File of original photo: %s not exists or is not a file",
+                    photo.getPath() + photo.getFilename()));
+        }
+        return originalPhoto;
+    }
+
+    /**
+     * Get thumbnail image by file name.
+     * @param filename file name with extension
+     * @return thumbnail image file
+     * @throws PhotoServiceException throws if file not exists or is not a file
+     */
+    public File getThumbnail(String filename) throws PhotoServiceException {
+        File thumb = Paths.get(baseCatalog).resolve(filename).toFile();
+        if (!thumb.exists() && !thumb.isFile()) {
+            throw new PhotoServiceException(String.format("Thumbnail file with name %s not found or it is not a file", filename));
+        }
+        return thumb;
+    }
+
+    /**
+     * Get all photos metadata from specified catalog. Catalog specify relative to base storage catalog.
+     * Uses for scan photo storage and obtaining metadata.
+     * @param path catalog in storage relative to base path
+     * @return List of Photo metadata
+     */
+    public List<Photo> getPhotosMetadataFromStorage(Path path) throws PhotoServiceException {
         List<Photo> photoList = new ArrayList<>();
         Path base = Paths.get(photoBasePath);
         File catalog = base.resolve(path).toFile();
@@ -98,12 +132,42 @@ public class PhotoService {
     }
 
     /**
-     * Get all Photo objects which stored in database in "photo" table
+     * Get all Photo metadata objects which stored in database in "photo" table
      * @param index string index name of Photo
      * @return List of Photo objects
      */
     public List<Photo> getPhotosFromDatabase(String index) {
         return photoRepository.findByIndex(index);
+    }
+
+    /**
+     * Get all photo indexes
+     * @return List of founded indexes
+     */
+    public List<PhotoIndex> getIndexes() {
+        return photoIndexRepository.findAll();
+    }
+
+    /**
+     * Get random original photo file from storage. It walks throw all storage catalogs and take random file by
+     * java.util.Random.
+     * @return original photo file
+     */
+    public File getRandomPhoto() {
+        //todo: walk throw storage is too long. This method must work with database only
+        File root = new File(photoBasePath);
+        List<File> fileList = new ArrayList<>();
+
+        try {
+            if (root.exists() && root.isDirectory()) {
+                Files.walk(root.toPath()).filter(Files::isRegularFile).forEach(path -> fileList.add(path.toFile()));
+            } else {
+                throw new RuntimeException("Error. " + photoBasePath + " path is not exists");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return fileList.get(random.nextInt(fileList.size()));
     }
 
     /**
@@ -116,13 +180,19 @@ public class PhotoService {
             photo.setName(photo.getFilename().substring(0, photo.getFilename().lastIndexOf('.')));
         }
 
-        photo.getIndexes().addAll(convertPath2Indexes(Paths.get(photo.getPath())));
+        photo.getIndexes().addAll(converter.convert(Paths.get(photo.getPath())));
 
         try {
             createThumb(photo);
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        Set<PhotoIndex> findedIndexes = photoIndexRepository
+                .findByNameIn(photo.getIndexes().stream().map(PhotoIndex::getName).collect(Collectors.toList()));
+        photo.getIndexes().removeIf(index ->
+                findedIndexes.stream().anyMatch(findedIndex -> findedIndex.getName().equals(index.getName())));
+        photo.getIndexes().addAll(findedIndexes);
 
         Photo saved = photoRepository.saveAndFlush(photo);
         photo.setId(saved.getId());
@@ -140,7 +210,7 @@ public class PhotoService {
                                  org.naivs.perimeter.smarthome.rest.to.Photo metadata
                                  //todo: *.to.Photo must not be used in this service layer (replace by *.entity.Photo)
     ) throws PhotoServiceException {
-        Path relativeDir = Paths.get(convertIndexes2Path(metadata.getIndexes())).normalize();
+        Path relativeDir = Paths.get(converter.convert(metadata.getIndexes())).normalize();
         Path photoDirPath = Paths.get(photoBasePath).resolve(relativeDir).normalize();
         File photoDir = photoDirPath.toFile();
 
@@ -172,35 +242,6 @@ public class PhotoService {
         return saveToDatabase(photo);
     }
 
-    /**
-     * Get all photo indexes
-     * @return List of founded indexes
-     */
-    public List<PhotoIndex> getIndexes() {
-        return photoIndexRepository.findAll();
-    }
-
-//    public Photo getPhoto(Path path) throws Exception {
-//        return photoRepository.findByPath(path.toString()).orElseThrow(() -> new Exception("Not found"));
-//    }
-
-    public File getRandomPhoto() {
-        File root = new File(photoBasePath);
-        List<File> fileList = new ArrayList<>();
-
-        try {
-            if (root.exists() && root.isDirectory()) {
-                Files.walk(root.toPath()).filter(Files::isRegularFile).forEach(path -> fileList.add(path.toFile()));
-            } else {
-                throw new RuntimeException("Error. " + photoBasePath + " path is not exists");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return fileList.get(random.nextInt(fileList.size()));
-    }
-
     public void scanAndPersist() {
         File folder = new File(photoBasePath);
 
@@ -219,7 +260,7 @@ public class PhotoService {
                                 String filePath = file.toAbsolutePath().toString();
                                 BasicFileAttributes attributes = Files.readAttributes(file, BasicFileAttributes.class);
                                 Photo photo = photoRepository
-                                        .findPhotoEntityByNameAndPath(file.getFileName().toString(), filePath)
+                                        .findPhotoByFilenameAndPath(file.getFileName().toString(), filePath)
                                         .orElse(new Photo());
                                 photo.setName(file.getFileName().toString());
                                 photo.setTimestamp(
@@ -244,8 +285,7 @@ public class PhotoService {
                                     }
                                 }
 
-                                Thumbnail thumbnail = new Thumbnail();
-                                photo.setThumbnail(thumbnail);
+                                photo.setThumbnail("");
                                 photoRepository.saveAndFlush(photo);
                             } catch (IOException e) {
                                 e.printStackTrace();
@@ -258,8 +298,6 @@ public class PhotoService {
     }
 
     private void createThumb(Photo photo) throws IOException {
-        Thumbnail thumbnail = new Thumbnail();
-
         BufferedImage bufferedImage = ImageIO.read(
                 Paths.get(photoBasePath).resolve(photo.getPath()).resolve(photo.getFilename()).toFile());
         int width = bufferedImage.getWidth(),
@@ -272,8 +310,7 @@ public class PhotoService {
                 output,
                 "jpg",
                 Paths.get(baseCatalog).resolve(photo.getUuid() + ".jpg").toFile());
-        thumbnail.setFileName(photo.getUuid() + ".jpg");
-        photo.setThumbnail(thumbnail);
+        photo.setThumbnail(photo.getUuid() + ".jpg");
     }
 
     private LocalDateTime getTimestamp(File photoFile) throws PhotoServiceException {
@@ -316,28 +353,5 @@ public class PhotoService {
                         String.format("Unable to set creation date to file %s", photoFile.getAbsolutePath()));
             }
         }
-    }
-
-    private List<PhotoIndex> convertPath2Indexes(Path path) {
-        List<PhotoIndex> indexList = new ArrayList<>();
-        String[] indexNames = path.normalize().toString().split("[/]");
-        for (String indexName : indexNames) {
-            if (!indexName.isEmpty()) {
-                PhotoIndex photoIndex = new PhotoIndex();
-                photoIndex.setName(indexName);
-                indexList.add(photoIndex);
-            }
-        }
-        return indexList;
-    }
-
-    private String convertIndexes2Path(String[] indexes) {
-        StringBuilder path = new StringBuilder();
-        for (String index : indexes) {
-            if (!index.isEmpty()) {
-                path.append(index).append("/");
-            }
-        }
-        return path.toString();
     }
 }

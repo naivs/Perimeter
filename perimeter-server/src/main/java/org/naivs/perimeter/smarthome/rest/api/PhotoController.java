@@ -2,6 +2,7 @@ package org.naivs.perimeter.smarthome.rest.api;
 
 import com.google.gson.Gson;
 import org.apache.commons.io.IOUtils;
+import org.naivs.perimeter.converter.AbstractConverter;
 import org.naivs.perimeter.exception.PhotoServiceException;
 import org.naivs.perimeter.library.service.PhotoService;
 import org.naivs.perimeter.smarthome.data.entity.PhotoIndex;
@@ -22,10 +23,12 @@ import java.time.LocalDateTime;
 public class PhotoController {
 
     private final PhotoService photoService;
+    private final AbstractConverter converter;
 
     @Autowired
-    public PhotoController(PhotoService photoService) {
+    public PhotoController(PhotoService photoService, AbstractConverter converter) {
         this.photoService = photoService;
+        this.converter = converter;
     }
 
     @RequestMapping(value = "index", method = RequestMethod.GET)
@@ -38,9 +41,23 @@ public class PhotoController {
         return photoService.getPhotosFromDatabase(indexName).toArray(new org.naivs.perimeter.smarthome.data.entity.Photo[0]);
     }
 
-    @RequestMapping(value = "original/{id}", method = RequestMethod.GET)
-    public ResponseEntity<byte[]> getPhotoOriginal(@PathVariable Long id) throws PhotoServiceException {
-        try (InputStream in = new BufferedInputStream(new FileInputStream(photoService.getPhoto(id)))) {
+    @RequestMapping(value = "original", method = RequestMethod.GET)
+    public ResponseEntity<byte[]> getPhotoOriginal(@RequestBody Photo photo) throws PhotoServiceException {
+        try (InputStream in = new BufferedInputStream(
+                new FileInputStream(photoService.getOriginalFile(
+                        converter.convert(photo, org.naivs.perimeter.smarthome.data.entity.Photo.class))))) {
+            byte[] media = IOUtils.toByteArray(in);
+            return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(media);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return ResponseEntity.badRequest().body(null);
+    }
+
+    @RequestMapping(value = "thumbnail/{name}", method = RequestMethod.GET)
+    public ResponseEntity<byte[]> getThumbnail(@PathVariable(name = "name") String name) throws PhotoServiceException {
+        try (InputStream in = new BufferedInputStream(
+                new FileInputStream(photoService.getThumbnail(name)))) {
             byte[] media = IOUtils.toByteArray(in);
             return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(media);
         } catch (IOException e) {
