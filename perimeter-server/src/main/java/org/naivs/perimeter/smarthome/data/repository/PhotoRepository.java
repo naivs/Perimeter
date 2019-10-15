@@ -12,6 +12,8 @@ public interface PhotoRepository extends JpaRepository<Photo, Long> {
 
     Optional<Photo> findPhotoByFilenameAndPath(String name, String path);
 
+    List<Photo> findAllByPath(String path);
+
     @Query(value = "SELECT * " +
             "FROM public.photo p " +
             "WHERE p.id in (" +

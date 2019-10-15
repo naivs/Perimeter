@@ -85,6 +85,22 @@ public class PhotoService {
     }
 
     /**
+     * Get all original photo catalogs from specified catalog.
+     * @param relativePath path of catalog (relative to photo storage base path)
+     * @return List of founded catalogs
+     */
+    public List<File> getOriginalCatalogs(Path relativePath) throws PhotoServiceException {
+        Path base = Paths.get(photoBasePath);
+        File catalog = base.resolve(relativePath).toFile();
+        if (catalog.exists() && catalog.isDirectory()) {
+            File[] catalogs = catalog.listFiles(File::isDirectory);
+            return catalogs == null ? Collections.emptyList() : Arrays.asList(catalogs);
+        } else {
+            throw new PhotoServiceException(String.format("Path %s is not valid", relativePath.toString()));
+        }
+    }
+
+    /**
      * Get thumbnail image by file name.
      * @param filename file name with extension
      * @return thumbnail image file
@@ -118,9 +134,9 @@ public class PhotoService {
                     Photo photo = new Photo();
                     photo.setFilename(photoFile.getName());
                     photo.setName(photoFile.getName().substring(0, photoFile.getName().lastIndexOf('.')));
-                    String absolutePath = photoFile.getAbsolutePath();
-                    absolutePath = absolutePath.substring(photoBasePath.length()).substring(0, photo.getFilename().length());
-                    photo.setPath(absolutePath);
+                    Path absolutePath = photoFile.toPath().getParent();
+                    photo.setPath(base.getNameCount() == absolutePath.getNameCount() ?
+                            "" : absolutePath.subpath(base.getNameCount(), absolutePath.getNameCount()).normalize().toString());
                     photo.setTimestamp(getTimestamp(photoFile));
                     photoList.add(photo);
                 }
@@ -138,6 +154,10 @@ public class PhotoService {
      */
     public List<Photo> getPhotosFromDatabase(String index) {
         return photoRepository.findByIndex(index);
+    }
+
+    public List<Photo> getPhotosFromDatabaseByPath(Path path) {
+        return photoRepository.findAllByPath(path.toString());
     }
 
     /**
@@ -168,6 +188,26 @@ public class PhotoService {
             e.printStackTrace();
         }
         return fileList.get(random.nextInt(fileList.size()));
+    }
+
+    public void removePhotoFromPhotobase(Photo photo) throws PhotoServiceException {
+        /*
+        delete file
+        delete thumbnail
+        delete database data cascade
+         */
+
+        File originalPhoto = Paths.get(photoBasePath).resolve(photo.getPath()).toFile();
+        boolean originDeleted = originalPhoto.delete();
+        File thumb = Paths.get(baseCatalog).resolve(photo.getThumbnail()).toFile();
+        boolean thumbDeleted = thumb.delete();
+
+        if (originDeleted && thumbDeleted) {
+            Photo storedPhoto = photoRepository.findPhotoByFilenameAndPath(photo.getFilename(), photo.getPath())
+                    .orElseThrow(() -> new PhotoServiceException(
+                            String.format("Photo with path: %s and filename: %s not found", photo.getPath(), photo.getFilename())));
+            photoRepository.deleteById(storedPhoto.getId());
+        }
     }
 
     /**
@@ -223,7 +263,6 @@ public class PhotoService {
 
         try {
             if (photoFile.isAbsolute() && !photoFile.exists()) {
-
                 FileCopyUtils.copy(inputStream, Files.newOutputStream(photoFile.toPath(), StandardOpenOption.CREATE_NEW));
             }
         } catch (IOException e) {

@@ -1,8 +1,8 @@
 package org.naivs.perimeter.library.service;
 
+import org.naivs.perimeter.exception.PhotoServiceException;
 import org.naivs.perimeter.smarthome.data.entity.Photo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -23,48 +23,47 @@ public class SyncService {
     }
 
     public void syncPhoto() {
-        List<Photo> storagePhotos = new ArrayList<>();
-        List<File> catalogs = new ArrayList<>();
+        List<Photo> deleted = new ArrayList<>();
+        List<Photo> newPhotos = new ArrayList<>();
 
-
+        try {
+            recursiveScan(newPhotos, deleted, Paths.get(""));
+            for (Photo p : deleted) {
+                photoService.removePhotoFromPhotobase(p);
+            }
+            newPhotos.forEach(photoService::saveToDatabase);
+        } catch (PhotoServiceException e) {
+            e.printStackTrace();
+        }
     }
 
+    private void recursiveScan(
+            List<Photo> newItems, List<Photo> deletedItems, Path catalog
+    ) throws PhotoServiceException {
+        List<Photo> storagePhotos = photoService.getPhotosMetadataFromStorage(catalog);
+        List<Photo> basePhotos = photoService.getPhotosFromDatabaseByPath(catalog);
 
-//    public void syncPhoto() throws Exception {
-//        syncPhoto(Paths.get(photoBasePath));
-//    }
+        List<Photo> newPhotos = storagePhotos.stream().filter(sp ->
+                basePhotos.stream().noneMatch(bf ->
+                        bf.getFilename().equals(sp.getFilename()) &&
+                                bf.getPath().equals(sp.getPath()) &&
+                                bf.getTimestamp().equals(sp.getTimestamp())))
+                .collect(Collectors.toList());
 
-//    private void syncPhoto(Path path) throws Exception {
-//        List<Photo> storagePhotos = new ArrayList<>();
-//        List<File> catalogs = new ArrayList<>();
-//
-//        File root = path.toFile();
-//        if (root.exists() && root.isDirectory()) {
-//            File[] files = root.listFiles(pathname -> {
-//                String name = pathname.getName();
-//                return name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png")
-//                        || name.endsWith(".JPG") || name.endsWith(".JPEG") || name.endsWith(".PNG");
-//            });
-//            files = files == null ? new File[0] : files;
-//            for (File file : files) {
-//                if (file.isFile()) {
-//                    storagePhotos.add(file);
-//                } else {
-//                    catalogs.add(file);
-//                }
-//            }
-//        } else {
-//            throw new Exception("Base catalog not exists or it is a file");
-//        }
-//
-//        List<Photo> dbPhotos = photoService.getPhotos(Path path);
-//
-//        List<Photo> diff = diffPhoto(storagePhotos, dbPhotos);
-//    }
-//
-//    private List<Photo> diffPhoto(List<File> storagePhotos, List<Photo> database) {
-//        List<Photo> db = photoService.getPhotos(
-//                fs.stream().map(File::getPath).collect(Collectors.toList()));
-//        fs.stream()
-//    }
+        List<Photo> deleted = basePhotos.stream().filter(bp ->
+                storagePhotos.stream().noneMatch(sp ->
+                        sp.getFilename().equals(bp.getFilename()) &&
+                                sp.getPath().equals(bp.getPath()) &&
+                                sp.getTimestamp().equals(bp.getTimestamp())))
+                .collect(Collectors.toList());
+
+        newItems.addAll(newPhotos);
+        deletedItems.addAll(deleted);
+
+        List<File> catalogs = photoService.getOriginalCatalogs(catalog);
+        for (File cat : catalogs) {
+            String name = cat.getName();
+            recursiveScan(newItems, deletedItems, catalog.resolve(name));
+        }
+    }
 }

@@ -5,6 +5,7 @@ import org.apache.commons.io.IOUtils;
 import org.naivs.perimeter.converter.AbstractConverter;
 import org.naivs.perimeter.exception.PhotoServiceException;
 import org.naivs.perimeter.library.service.PhotoService;
+import org.naivs.perimeter.library.service.SyncService;
 import org.naivs.perimeter.smarthome.data.entity.PhotoIndex;
 import org.naivs.perimeter.smarthome.rest.to.MultipartPhotoForm;
 import org.naivs.perimeter.smarthome.rest.to.Photo;
@@ -23,11 +24,13 @@ import java.time.LocalDateTime;
 public class PhotoController {
 
     private final PhotoService photoService;
+    private final SyncService syncService;
     private final AbstractConverter converter;
 
     @Autowired
-    public PhotoController(PhotoService photoService, AbstractConverter converter) {
+    public PhotoController(PhotoService photoService, SyncService syncService, AbstractConverter converter) {
         this.photoService = photoService;
+        this.syncService = syncService;
         this.converter = converter;
     }
 
@@ -79,9 +82,9 @@ public class PhotoController {
         return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(new byte[0]);
     }
 
-    @RequestMapping(value = "scan", method = RequestMethod.GET)
+    @RequestMapping(value = "sync", method = RequestMethod.GET)
     public String scan() {
-//        photoService.walk(new File(libraryDir));
+        syncService.syncPhoto();
         return "OK";
     }
 
