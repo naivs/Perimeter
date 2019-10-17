@@ -37,6 +37,7 @@ public class Photo {
     private Set<PhotoIndex> indexes = new HashSet<>();
     @Column(name = "thumbnail", nullable = false)
     private String thumbnail;
+    private String hash;
 
     public Photo() {
         PhotoIndex photoIndex = new PhotoIndex();
@@ -115,6 +116,14 @@ public class Photo {
 
     public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
+    }
+
+    public String getHash() {
+        return hash;
+    }
+
+    public void setHash(String hash) {
+        this.hash = hash;
     }
 
     @Override

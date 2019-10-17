@@ -23,6 +23,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -31,6 +32,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -138,6 +141,7 @@ public class PhotoService {
                     photo.setPath(base.getNameCount() == absolutePath.getNameCount() ?
                             "" : absolutePath.subpath(base.getNameCount(), absolutePath.getNameCount()).normalize().toString());
                     photo.setTimestamp(getTimestamp(photoFile));
+                    photo.setHash(hash(photoFile));
                     photoList.add(photo);
                 }
             }
@@ -277,6 +281,7 @@ public class PhotoService {
         photo.setPath(relativeDir.toString());
         LocalDateTime timestamp = getTimestamp(photoFile);
         photo.setTimestamp(timestamp.plusMinutes(1).isAfter(metadata.getTimestamp()) ? metadata.getTimestamp() : timestamp);
+        photo.setHash(hash(photoFile));
 
         return saveToDatabase(photo);
     }
@@ -392,5 +397,28 @@ public class PhotoService {
                         String.format("Unable to set creation date to file %s", photoFile.getAbsolutePath()));
             }
         }
+    }
+
+    private String hash(File file) {
+        try (InputStream in = new FileInputStream(file)) {
+            MessageDigest digest = MessageDigest.getInstance("SHA-1");
+            byte[] block = new byte[4096];
+            int length;
+            while ((length = in.read(block)) > 0) {
+                digest.update(block, 0, length);
+            }
+            return byteToHexString(digest.digest());
+        } catch (IOException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private String byteToHexString(byte[] hash) {
+        StringBuilder result = new StringBuilder();
+        for (byte hash1 : hash) {
+            result.append(Integer.toString((hash1 & 0xff) + 0x100, 16).substring(1));
+        }
+        return result.toString();
     }
 }
