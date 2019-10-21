@@ -1,0 +1,33 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-3">
+      <mat-selection-list #indexList [(ngModel)]="selectedIndexes" (selectionChange)="toggle()">
+        <h3 mat-subheader>Indexes</h3>
+        <mat-list-option *ngFor="let index of model.getIndexes()" [value]="index">
+          <mat-icon mat-list-icon>folder</mat-icon>
+          <h4 mat-line>{{index}}</h4>
+        </mat-list-option>
+      </mat-selection-list>
+    </div>
+    <div class="col-sm-9">
+      <mat-grid-list [cols]="4" rowHeight="270px">
+        <mat-grid-tile *ngFor="let photo of photos"
+                       [colspan]="1" [rowspan]="1">
+          <mat-card class="example-card">
+            <mat-card-header>
+              <mat-card-title>{{photo.name}}</mat-card-title>
+              <mat-card-subtitle>{{photo.description}}</mat-card-subtitle>
+            </mat-card-header>
+            <img mat-card-image src="{{photo.thumbPath}}" alt="{{photo.path}}">
+          </mat-card>
+        </mat-grid-tile>
+      </mat-grid-list>
+    </div>
+  </div>
+</div>
+
+<mat-paginator [length]="photos.length"
+               [pageSize]="pageSize"
+               [pageSizeOptions]="pageSizeOptions"
+               (page)="pageEvent = $event">
+</mat-paginator>
