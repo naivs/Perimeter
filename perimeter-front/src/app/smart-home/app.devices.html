@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container-fluid">
   <div class="container">
     <div class="row">
       <div class="col-md-6">
@@ -19,28 +19,28 @@
       <th>Action</th>
     </tr>
     </thead>
-    <tbody>
-    <tr>
-      <td>{{device.id}}</td>
-      <td>{{device.typeId}}</td>
-      <td>{{device.description}}</td>
-      <td>
-        <button class="btn btn-info" data-toggle="collapse" data-target="#deviceParamsRow">Инфо</button>
-        <button class="btn btn-success">Изменить</button>
-        <button class="btn btn-danger">Удалить</button>
-      </td>
-    </tr>
-    <tr id="deviceParamsRow-{{$index}}" class="collapse">
-      <td colspan="4">
-        <div class="container">
-          <div class="row">
-            <div class="col-md-2">{{param.name}}</div>
-            <div class="col-md-5">{{param.val}}</div>
-            <div class="col-md-5">{{param.description}}</div>
+    <tbody *ngFor="let device of devices">
+      <tr>
+        <td>{{device.id}}</td>
+        <td>{{device.type}}</td>
+        <td>{{device.description}}</td>
+        <td>
+          <button class="btn btn-info" data-toggle="collapse" data-target="#deviceParamsRow">Инфо</button>
+          <button class="btn btn-success">Изменить</button>
+          <button class="btn btn-danger">Удалить</button>
+        </td>
+      </tr>
+      <tr id="deviceParamsRow-{{$index}}" class="collapse">
+        <td colspan="4">
+          <div class="container">
+            <div class="row">
+              <div class="col-md-2">{{param.name}}</div>
+              <div class="col-md-5">{{param.val}}</div>
+              <div class="col-md-5">{{param.description}}</div>
+            </div>
           </div>
-        </div>
-      </td>
-    </tr>
+        </td>
+      </tr>
     </tbody>
   </table>
 
@@ -56,7 +56,7 @@
             <div class="form-group">
               <select class="form-control" required>
                 <option value="" selected disabled hidden>Тип устройства</option>
-                <option value="{{deviceType.id}}">{{deviceType.type}}: {{deviceType.description}}</option>
+                <option value="65">asdf: descr</option>
               </select>
               <label>Параметры</label>
               <div class="container">
