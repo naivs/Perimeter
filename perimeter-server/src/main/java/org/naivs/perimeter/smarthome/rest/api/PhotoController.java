@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("photo") //todo: Rest exceptions response
+@CrossOrigin(origins = {"http://localhost:8090", "http://localhost:4200"})
 public class PhotoController {
 
     private final PhotoService photoService;
