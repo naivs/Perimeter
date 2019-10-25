@@ -19,6 +19,8 @@ import { MatCardModule } from "@angular/material";
 import { MatGridListModule } from "@angular/material";
 import { FormsModule } from "@angular/forms";
 import { Dash } from "./dash/dash.component";
+import {HttpClient, HttpClientModule} from "@angular/common/http";
+import { RepositoryModel } from "./repository.model";
 
 @NgModule({
   declarations: [
@@ -42,9 +44,10 @@ import { Dash } from "./dash/dash.component";
     MatPaginatorModule,
     MatCardModule,
     MatGridListModule,
-    FormsModule
+    FormsModule,
+    HttpClientModule
   ],
-  providers: [],
+  providers: [HttpClient, RepositoryModel],
   bootstrap: [MyNavComponent]
 })
 export class AppModule { }

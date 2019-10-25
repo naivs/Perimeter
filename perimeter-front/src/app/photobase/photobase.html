@@ -3,7 +3,7 @@
     <div class="col-sm-3">
       <mat-selection-list #indexList [(ngModel)]="selectedIndexes" (selectionChange)="toggle()">
         <h3 mat-subheader>Indexes</h3>
-        <mat-list-option *ngFor="let index of model.getIndexes()" [value]="index">
+        <mat-list-option *ngFor="let index of indexes" [value]="index">
           <mat-icon mat-list-icon>folder</mat-icon>
           <h4 mat-line>{{index}}</h4>
         </mat-list-option>
@@ -23,6 +23,7 @@
         </mat-grid-tile>
       </mat-grid-list>
     </div>
+    <button class="btn btn-info" (click)="updateIndexes()">Update</button>
   </div>
 </div>
 

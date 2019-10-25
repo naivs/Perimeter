@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
-import { Model } from "../repository.model";
+import {Component, ɵSWITCH_COMPILE_INJECTABLE__POST_R3__} from '@angular/core';
 import {Photo} from "./photobase.model";
+import { RepositoryModel } from "../repository.model";
 
 @Component({
   selector: 'photobase',
@@ -9,11 +9,17 @@ import {Photo} from "./photobase.model";
 })
 export class Photobase {
   photos: Photo[] = [];
-  model: Model = new Model();
-
+  indexes: String[] = [];
   selectedIndexes: string[] = [];
 
+  constructor(private repository:RepositoryModel) {
+  }
+
   toggle() {
-    this.photos = this.model.getPhotos(this.selectedIndexes)
+    this.repository.getIndexes();
+  }
+
+  updateIndexes() {
+    this.indexes = this.repository.getIndexes();
   }
 }
