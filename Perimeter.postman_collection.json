@@ -1,0 +1,154 @@
+{
+	"info": {
+		"_postman_id": "99e86ae8-e782-4a1a-8642-bd562328efc3",
+		"name": "Perimeter",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "add photos",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "files",
+							"type": "file",
+							"src": "/home/ivan/Pictures/0K1CoIw.jpg"
+						},
+						{
+							"key": "metadata",
+							"value": "[{\"name\": \"test\",\"description\": \"desc_test\", \"indexes\":[\"test\"]}]",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:8090/photo",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"photo"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get indexes",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8090/photo/index",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"photo",
+						"index"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get photos by index",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": ""
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "sync",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8090/photo/sync",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"photo",
+						"sync"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get thumbnail",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8090/photo/thumbnail/c05b707f-c57f-3ab7-b5db-f6e0434e8fcd.jpg",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"photo",
+						"thumbnail",
+						"c05b707f-c57f-3ab7-b5db-f6e0434e8fcd.jpg"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get original photo",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"DSCN0545\",\n    \"filename\": \"DSCN0545.JPG\",\n    \"path\": \"\",\n    \"timestamp\": \"2011-01-01T00:00:00\",\n    \"added\": \"2019-10-27T12:02:41.293\",\n    \"description\": null,\n    \"indexes\": [\"root\"],\n    \"thumbnail\": \"43dae11c-e23e-37bf-b0f3-e9caf4db846e.jpg\",\n    \"hash\": \"85d2a19d0236ae64f72761ef12c8f2d1ddfe4385\",\n    \"uuid\": \"43dae11c-e23e-37bf-b0f3-e9caf4db846e\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8090/photo/original/12",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"photo",
+						"original",
+						"12"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
