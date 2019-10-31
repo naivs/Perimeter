@@ -18,12 +18,11 @@
               <mat-card-title>{{photo.name}}</mat-card-title>
               <mat-card-subtitle>{{photo.description}}</mat-card-subtitle>
             </mat-card-header>
-            <img mat-card-image src="{{photo.thumbPath}}" alt="{{photo.path}}">
+            <img mat-card-image [src]="getLocation() + '/photo/thumbnail/' + photo.thumbnail">
           </mat-card>
         </mat-grid-tile>
       </mat-grid-list>
     </div>
-    <button class="btn btn-info" (click)="updateIndexes()">Update</button>
   </div>
 </div>
 

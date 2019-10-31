@@ -40,9 +40,9 @@ public class PhotoController {
         return photoService.getIndexes().toArray(new PhotoIndex[0]);
     }
 
-    @RequestMapping(value = "index/{indexName}", method = RequestMethod.GET)
-    public org.naivs.perimeter.smarthome.data.entity.Photo[] getPhotos(@PathVariable String indexName) {
-        return photoService.getPhotosFromDatabase(indexName).toArray(new org.naivs.perimeter.smarthome.data.entity.Photo[0]);
+    @RequestMapping(value = "index", method = RequestMethod.POST)
+    public org.naivs.perimeter.smarthome.data.entity.Photo[] getPhotos(@RequestBody String[] indexNames) {
+        return photoService.getPhotosFromDatabase(indexNames).toArray(new org.naivs.perimeter.smarthome.data.entity.Photo[0]);
     }
 
     @RequestMapping(value = "original", method = RequestMethod.GET)

@@ -153,11 +153,11 @@ public class PhotoService {
 
     /**
      * Get all Photo metadata objects which stored in database in "photo" table
-     * @param index string index name of Photo
+     * @param indexes string index name of Photo
      * @return List of Photo objects
      */
-    public List<Photo> getPhotosFromDatabase(String index) {
-        return photoRepository.findByIndex(index);
+    public List<Photo> getPhotosFromDatabase(String[] indexes) {
+        return photoRepository.findByIndexes(indexes);
     }
 
     public List<Photo> getPhotosFromDatabaseByPath(Path path) {

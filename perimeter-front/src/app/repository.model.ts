@@ -7,58 +7,34 @@ import {HttpClient} from "@angular/common/http";
 export class RepositoryModel {
   private photos:Photo[];
   private indexes:string[];
-  private url:string = "http://localhost:8090/photo";
 
   constructor(private http: HttpClient) {
-    this.photos = [
-      new Photo("test_1",
-        "https://material.angular.io/assets/img/examples/shiba2.jpg",
-        "Описание раз", "https://material.angular.io/assets/img/examples/shiba2.jpg",
-        ["root", "travel"]),
-      new Photo("test_2",
-        "https://material.angular.io/assets/img/examples/shiba2.jpg",
-        "Описание два", "https://material.angular.io/assets/img/examples/shiba2.jpg",
-        ["root"]),
-      new Photo("test_3",
-        "https://material.angular.io/assets/img/examples/shiba2.jpg",
-        "Описание три", "https://material.angular.io/assets/img/examples/shiba2.jpg",
-        ["root", "travel"]),
-      new Photo("test_4",
-        "https://material.angular.io/assets/img/examples/shiba2.jpg",
-        "Описание четыре", "https://material.angular.io/assets/img/examples/shiba2.jpg",
-        ["root"]),
-      new Photo("test_5",
-        "https://material.angular.io/assets/img/examples/shiba2.jpg",
-        "Описание пять", "https://material.angular.io/assets/img/examples/shiba2.jpg",
-        ["root"]),
-      new Photo("Future",
-        "assets/test.jpg", "Это вобще супер картинка", "assets/test.jpg",
-        ["root", "best"])
-    ];
-
-    this.indexes = ["root", "travel", "best"];
+    this.photos = [];
+    this.indexes = [];
   }
 
-  getPhotos(indexes: string[]): Photo[] {
-    return this.photos.filter((photo) => {
-      return photo.indexes.some(pInd => {
-        return indexes.some(selInd => {
-          return pInd === selInd;
-        })
-      })
-    });
-  }
-
-  getIndexes(): string[] {
+  getPhotosByIndexes(indexes: string[]): Photo[] {
     this.http
-      .get(`${this.url}/index`).subscribe(
+      .post(`http://localhost:8090/photo/index`, indexes).subscribe(
       (response) => {
-        let idx:Index[] = [];
-        Object.assign(idx, response);
-        this.indexes = idx.map(idxItem => idxItem.name);
+        let phts:Photo[] = [];
+        Object.assign(phts, response);
+        this.photos = phts;
+          // .filter((photo) => {
+          // return photo.indexes.some(pInd => {
+          //   return indexes.some(selInd => {
+          //     return pInd === selInd;
+          //   })
+          // })
+        // });
       },
       (error) => console.log(error)
     );
+    return this.photos;
+  }
+
+  getIndexes(): string[] {
+
     return this.indexes;
   }
 }

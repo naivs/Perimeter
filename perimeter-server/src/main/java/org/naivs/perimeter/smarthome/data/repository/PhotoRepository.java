@@ -14,11 +14,11 @@ public interface PhotoRepository extends JpaRepository<Photo, Long> {
 
     List<Photo> findAllByPath(String path);
 
-    @Query(value = "SELECT * " +
-            "FROM public.photo p " +
-            "WHERE p.id in (" +
-            "SELECT pies.photo_id " +
-            "FROM public.photo_indexes pies, public.photo_index pi " +
-            "WHERE pies.indexes_id=pi.id AND pi.name=:index)", nativeQuery = true)
-    List<Photo> findByIndex(@Param(value = "index") String index);
+    @Query(value = "SELECT * FROM public.photo P " +
+            "WHERE P.id in ( " +
+            "    SELECT INDX.photo_id " +
+            "    FROM public.photo_indexes INDX JOIN public.photo_index IND " +
+            "ON INDX.photo_index_id = IND.id " +
+            "    WHERE IND.name in :indexes)", nativeQuery = true)
+    List<Photo> findByIndexes(@Param(value = "indexes") String[] indexes);
 }
