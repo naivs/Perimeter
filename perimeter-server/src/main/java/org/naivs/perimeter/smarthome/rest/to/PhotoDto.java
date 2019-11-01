@@ -3,17 +3,24 @@ package org.naivs.perimeter.smarthome.rest.to;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
-public class Photo {
+public class PhotoDto {
+    private Long id;
     private String name;
-    private String filename;
-    private String path;
     private String description;
     private String[] indexes;
     private LocalDateTime timestamp;
     private LocalDateTime added;
     private String thumbnailName;
 
-    public Photo() {
+    public PhotoDto() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -48,22 +55,6 @@ public class Photo {
         this.timestamp = timestamp;
     }
 
-    public String getFilename() {
-        return filename;
-    }
-
-    public void setFilename(String filename) {
-        this.filename = filename;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
     public LocalDateTime getAdded() {
         return added;
     }
@@ -83,6 +74,7 @@ public class Photo {
     @Override
     public String toString() {
         return "Photo{" +
+                "id='" + id + '\'' +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", indexes=" + Arrays.toString(indexes) +

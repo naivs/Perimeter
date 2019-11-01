@@ -1,5 +1,6 @@
 package org.naivs.perimeter.smarthome.data.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
@@ -34,7 +35,7 @@ public class Photo {
             joinColumns = @JoinColumn(name = "photo_id"),
             inverseJoinColumns = @JoinColumn(name = "photo_index_id")
     )
-    private Set<PhotoIndex> indexes = new HashSet<>();
+    private List<PhotoIndex> indexes = new ArrayList<>();
     @Column(name = "thumbnail", nullable = false)
     private String thumbnail;
     private String hash;
@@ -94,11 +95,11 @@ public class Photo {
         this.description = description;
     }
 
-    public Set<PhotoIndex> getIndexes() {
+    public List<PhotoIndex> getIndexes() {
         return indexes;
     }
 
-    public void setIndexes(Set<PhotoIndex> indexes) {
+    public void setIndexes(List<PhotoIndex> indexes) {
         this.indexes = indexes;
     }
 
@@ -143,6 +144,7 @@ public class Photo {
         return Objects.hash(name, filename, path, timestamp, description);
     }
 
+    @JsonIgnore
     public String getUuid() {
         //todo: timestamp evolve only not file system timestamp. Also needs size or checksum
         return UUID.nameUUIDFromBytes(("Photo-" + path + filename + timestamp).getBytes()).toString();

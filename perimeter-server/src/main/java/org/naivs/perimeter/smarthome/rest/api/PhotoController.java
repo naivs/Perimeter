@@ -6,9 +6,10 @@ import org.naivs.perimeter.converter.AbstractConverter;
 import org.naivs.perimeter.exception.PhotoServiceException;
 import org.naivs.perimeter.library.service.PhotoService;
 import org.naivs.perimeter.library.service.SyncService;
+import org.naivs.perimeter.smarthome.data.entity.Photo;
 import org.naivs.perimeter.smarthome.data.entity.PhotoIndex;
 import org.naivs.perimeter.smarthome.rest.to.MultipartPhotoForm;
-import org.naivs.perimeter.smarthome.rest.to.Photo;
+import org.naivs.perimeter.smarthome.rest.to.PhotoDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("photo") //todo: Rest exceptions response
@@ -41,15 +43,16 @@ public class PhotoController {
     }
 
     @RequestMapping(value = "index", method = RequestMethod.POST)
-    public org.naivs.perimeter.smarthome.data.entity.Photo[] getPhotos(@RequestBody String[] indexNames) {
-        return photoService.getPhotosFromDatabase(indexNames).toArray(new org.naivs.perimeter.smarthome.data.entity.Photo[0]);
+    public PhotoDto[] getPhotos(@RequestBody String[] indexNames) {
+        List<org.naivs.perimeter.smarthome.data.entity.Photo> photos =
+                photoService.getPhotosFromDatabase(indexNames);
+        return converter.convert(photos, PhotoDto.class).toArray(new PhotoDto[0]);
     }
 
-    @RequestMapping(value = "original", method = RequestMethod.GET)
-    public ResponseEntity<byte[]> getPhotoOriginal(@RequestBody Photo photo) throws PhotoServiceException {
+    @RequestMapping(value = "original/{id}", method = RequestMethod.GET)
+    public ResponseEntity<byte[]> getPhotoOriginal(@PathVariable("id") Long id) throws PhotoServiceException {
         try (InputStream in = new BufferedInputStream(
-                new FileInputStream(photoService.getOriginalFile(
-                        converter.convert(photo, org.naivs.perimeter.smarthome.data.entity.Photo.class))))) {
+                new FileInputStream(photoService.getOriginalFile(id)))) {
             byte[] media = IOUtils.toByteArray(in);
             return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(media);
         } catch (IOException e) {
@@ -95,7 +98,7 @@ public class PhotoController {
     ) throws IOException, PhotoServiceException {
         String metadata = multipartPhotoForm.getMetadata();
         Gson g = new Gson();
-        Photo[] photos = g.fromJson(metadata, Photo[].class);
+        PhotoDto[] photos = g.fromJson(metadata, PhotoDto[].class);
 
         Assert.isTrue(photos.length == multipartPhotoForm.getFiles().length,
                 String.format("Wrong metadata count (expected:%d, actual:%d)",
@@ -103,7 +106,7 @@ public class PhotoController {
 
         int index = 0;
         for (MultipartFile multipartFile : multipartPhotoForm.getFiles()) {
-            Photo metadataItem = photos[index];
+            Photo metadataItem = converter.convert(photos[index], Photo.class);
             metadataItem.setFilename(multipartFile.getOriginalFilename());
             if (metadataItem.getTimestamp() == null) {
                 metadataItem.setTimestamp(LocalDateTime.now());

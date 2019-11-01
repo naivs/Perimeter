@@ -1,27 +1,14 @@
 <div class="container-fluid">
-  <div class="row">
+  <div class="row photobase-content">
     <div class="col-sm-3">
-      <mat-selection-list #indexList [(ngModel)]="selectedIndexes" (selectionChange)="toggle()">
-        <h3 mat-subheader>Indexes</h3>
-        <mat-list-option *ngFor="let index of indexes" [value]="index">
-          <mat-icon mat-list-icon>folder</mat-icon>
-          <h4 mat-line>{{index}}</h4>
-        </mat-list-option>
-      </mat-selection-list>
+      <mat-button-toggle-group class="toggle-indexes" name="indexes" aria-label="Indexes" [vertical]="true">
+        <mat-button-toggle *ngFor="let index of indexes" [value]="index" (change)="toggle(index)">
+            <mat-icon mat-list-icon>folder</mat-icon> {{index}}
+        </mat-button-toggle>
+      </mat-button-toggle-group>
     </div>
     <div class="col-sm-9">
-      <mat-grid-list [cols]="4" rowHeight="270px">
-        <mat-grid-tile *ngFor="let photo of photos"
-                       [colspan]="1" [rowspan]="1">
-          <mat-card class="example-card">
-            <mat-card-header>
-              <mat-card-title>{{photo.name}}</mat-card-title>
-              <mat-card-subtitle>{{photo.description}}</mat-card-subtitle>
-            </mat-card-header>
-            <img mat-card-image [src]="getLocation() + '/photo/thumbnail/' + photo.thumbnail">
-          </mat-card>
-        </mat-grid-tile>
-      </mat-grid-list>
+      <app-grid-gallery [photos]="photos" [cols]="4" [rowHeight]="1"></app-grid-gallery>
     </div>
   </div>
 </div>

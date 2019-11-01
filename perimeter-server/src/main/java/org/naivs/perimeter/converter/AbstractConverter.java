@@ -4,7 +4,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.naivs.perimeter.exception.ConverterException;
 import org.naivs.perimeter.smarthome.data.entity.PhotoIndex;
-import org.naivs.perimeter.smarthome.rest.to.Photo;
+import org.naivs.perimeter.smarthome.rest.to.PhotoDto;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Type;
@@ -24,7 +24,11 @@ public class AbstractConverter {
                 .setFieldMatchingEnabled(true)
                 .setSkipNullEnabled(true);
 
-        modelMapper.createTypeMap(Photo.class, org.naivs.perimeter.smarthome.data.entity.Photo.class);
+        modelMapper.createTypeMap(PhotoDto.class, org.naivs.perimeter.smarthome.data.entity.Photo.class);
+        modelMapper.createTypeMap(org.naivs.perimeter.smarthome.data.entity.Photo.class, PhotoDto.class)
+                .addMappings(mapping -> mapping.map(
+                        org.naivs.perimeter.smarthome.data.entity.Photo::getThumbnail,
+                        PhotoDto::setThumbnailName));
     }
 
     public <D> D convert(Object source, Type destinationType) {
@@ -63,7 +67,7 @@ public class AbstractConverter {
         return indexList;
     }
 
-    public String convert(String[] indexes) {
+    public String convert(List<String> indexes) {
         StringBuilder path = new StringBuilder();
         for (String index : indexes) {
             if (!index.isEmpty()) {

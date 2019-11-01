@@ -7,6 +7,7 @@ import org.naivs.perimeter.Application;
 import org.naivs.perimeter.exception.PhotoServiceException;
 import org.naivs.perimeter.smarthome.data.entity.Photo;
 import org.naivs.perimeter.smarthome.data.repository.PhotoRepository;
+import org.naivs.perimeter.smarthome.rest.to.PhotoDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -18,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -97,11 +99,11 @@ public class PhotoServiceTest {
         File file = Paths.get(this.getClass().getClassLoader()
                 .getResource("but.jpeg").getFile()).toFile();
 
-        org.naivs.perimeter.smarthome.rest.to.Photo metadata = new org.naivs.perimeter.smarthome.rest.to.Photo();
+        Photo metadata = new Photo();
         metadata.setName("name from metadata");
         metadata.setFilename(file.getName());
         metadata.setDescription("This is test photo");
-        metadata.setIndexes(new String[]{});
+        metadata.setIndexes(new ArrayList<>());
         metadata.setTimestamp(LocalDateTime.now());
         try {
             Photo photo = photoService.saveToPhotobase(Files.newInputStream(file.toPath()), metadata);

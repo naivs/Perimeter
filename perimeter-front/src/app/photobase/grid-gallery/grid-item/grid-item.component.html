@@ -1,0 +1,6 @@
+<img  #img
+      [src]="getLocation() + '/photo/thumbnail/' + photo?.thumbnailName"
+      [alt]=""
+      (load)="calculateRows()"
+      matTooltip="Name: {{photo.name}} Timestamp: {{photo.timestamp}} Description: {{photo.description}}"
+      (click)="openDialog(photo)"/>

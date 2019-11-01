@@ -32,7 +32,9 @@ export class Photobase {
     return idxs;
   }
 
-  toggle() {
+  toggle(index:string) {
+    this.selectedIndexes = [];
+    this.selectedIndexes.push(index);
     if (this.selectedIndexes.length == 0) {
       this.photos = [];
     } else {

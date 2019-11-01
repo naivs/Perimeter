@@ -48,6 +48,7 @@ public class PhotoService {
     private String photoBasePath;
     @Value("${base.catalog}")
     private String baseCatalog;
+    private static final float THUMBS_SIDE_SIZE = 200.0F;
     private final PhotoRepository photoRepository;
     private final PhotoIndexRepository photoIndexRepository;
     private final AbstractConverter converter;
@@ -65,17 +66,15 @@ public class PhotoService {
 
     /**
      * Get file of original photo. Uses for obtain photo from storage and receive over http.
-     * @param photo photo entity with photo metadata
+     * @param id photo entity identification
      * @return original photo file
      * @throws PhotoServiceException throws if file not registered in database or
      * if file not exists in storage or if not a file
      */
-    public File getOriginalFile(Photo photo) throws PhotoServiceException {
-        photoRepository.findPhotoByFilenameAndPath(photo.getFilename(), photo.getPath()).orElseThrow(() ->
+    public File getOriginalFile(Long id) throws PhotoServiceException {
+        Photo photo = photoRepository.findPhotoById(id).orElseThrow(() ->
                         new PhotoServiceException(
-                                String.format("Photo with relative=%s and name=%s not found",
-                                        photo.getPath(),
-                                        photo.getFilename())));
+                                String.format("Photo with id=%d not found", id)));
         File originalPhoto = Paths.get(photoBasePath)
                 .resolve(photo.getPath())
                 .resolve(photo.getFilename())
@@ -251,10 +250,11 @@ public class PhotoService {
      * @return Photo entity
      */
     public Photo saveToPhotobase(InputStream inputStream,
-                                 org.naivs.perimeter.smarthome.rest.to.Photo metadata
-                                 //todo: *.to.Photo must not be used in this service layer (replace by *.entity.Photo)
+                                 Photo metadata
     ) throws PhotoServiceException {
-        Path relativeDir = Paths.get(converter.convert(metadata.getIndexes())).normalize();
+        Path relativeDir = Paths.get(converter.convert(metadata.getIndexes().stream()
+                .map(PhotoIndex::getName).collect(Collectors.toList())))
+                .normalize();
         Path photoDirPath = Paths.get(photoBasePath).resolve(relativeDir).normalize();
         File photoDir = photoDirPath.toFile();
 
@@ -344,10 +344,20 @@ public class PhotoService {
     private void createThumb(Photo photo) throws IOException {
         BufferedImage bufferedImage = ImageIO.read(
                 Paths.get(photoBasePath).resolve(photo.getPath()).resolve(photo.getFilename()).toFile());
-        int width = bufferedImage.getWidth(),
-                height = bufferedImage.getHeight();
+
+        float height, width;
+        if (bufferedImage.getHeight() < bufferedImage.getWidth()) {
+            width = THUMBS_SIDE_SIZE;
+            float compressP = THUMBS_SIDE_SIZE / bufferedImage.getWidth() * 100;
+            height = bufferedImage.getHeight() * compressP / 100;
+        } else {
+            height = THUMBS_SIDE_SIZE;
+            float compressP = THUMBS_SIDE_SIZE / bufferedImage.getHeight() * 100;
+            width = bufferedImage.getWidth() * compressP / 100;
+        }
+
         //todo: image scaling must be perform in same size (not relatively to source size)
-        BufferedImage output = new BufferedImage(width / 6, height / 6, bufferedImage.getType());
+        BufferedImage output = new BufferedImage((int) width, (int) height, bufferedImage.getType());
         output.createGraphics().drawImage(
                 bufferedImage.getScaledInstance(output.getWidth(), output.getHeight(), Image.SCALE_SMOOTH), 0, 0, null);
         ImageIO.write(

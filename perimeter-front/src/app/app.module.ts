@@ -17,10 +17,17 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { MatPaginatorModule } from "@angular/material";
 import { MatCardModule } from "@angular/material";
 import { MatGridListModule } from "@angular/material";
-import { FormsModule } from "@angular/forms";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { Dash } from "./dash/dash.component";
-import {HttpClient, HttpClientModule} from "@angular/common/http";
+import { HttpClient, HttpClientModule } from "@angular/common/http";
 import { RepositoryModel } from "./repository.model";
+import { GridGalleryItemComponent, DialogOverviewExampleDialog } from "./photobase/grid-gallery/grid-item/grid-item.component";
+import { GridGalleryComponent } from "./photobase/grid-gallery/grid-gallery.component";
+import { MatButtonToggleModule } from "@angular/material";
+import { MatTooltipModule } from "@angular/material";
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from "@angular/material";
+import { ImageViewerModule } from "ngx-image-viewer";
 
 @NgModule({
   declarations: [
@@ -29,7 +36,10 @@ import { RepositoryModel } from "./repository.model";
     Photobase,
     MyNavComponent,
     LibraryComponent,
-    Dash
+    Dash,
+    GridGalleryItemComponent,
+    GridGalleryComponent,
+    DialogOverviewExampleDialog
   ],
   imports: [
     BrowserModule,
@@ -45,9 +55,34 @@ import { RepositoryModel } from "./repository.model";
     MatCardModule,
     MatGridListModule,
     FormsModule,
-    HttpClientModule
+    ReactiveFormsModule,
+    HttpClientModule,
+    MatButtonToggleModule,
+    MatTooltipModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    ImageViewerModule.forRoot({
+      wheelZoom: true,
+      btnIcons: {
+        zoomIn: 'fa fa-plus',
+        zoomOut: 'fa fa-minus',
+        rotateClockwise: 'fa fa-repeat',
+        rotateCounterClockwise: 'fa fa-undo',
+        next: 'fa fa-arrow-right',
+        prev: 'fa fa-arrow-left',
+        fullscreen: 'fa fa-arrows-alt'
+      },
+      btnShow: {
+        zoomIn: true,
+        zoomOut: true,
+        rotateClockwise: false,
+        rotateCounterClockwise: false,
+        next: false,
+        prev: false
+      }
+    })
   ],
   providers: [HttpClient, RepositoryModel],
-  bootstrap: [MyNavComponent]
+  bootstrap: [MyNavComponent, DialogOverviewExampleDialog]
 })
 export class AppModule { }
